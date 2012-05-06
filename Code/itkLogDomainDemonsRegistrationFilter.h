@@ -172,7 +172,7 @@ private:
 } // end namespace itk
 
 #ifndef ITK_MANUAL_INSTANTIATION
-#include "itkLogDomainDemonsRegistrationFilter.txx"
+#include "itkLogDomainDemonsRegistrationFilter.hxx"
 #endif
 
 #endif

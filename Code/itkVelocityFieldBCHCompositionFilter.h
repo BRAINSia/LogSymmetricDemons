@@ -133,7 +133,7 @@ private:
 } // end namespace itk
 
 #ifndef ITK_MANUAL_INSTANTIATION
-#include "itkVelocityFieldBCHCompositionFilter.txx"
+#include "itkVelocityFieldBCHCompositionFilter.hxx"
 #endif
 
 #endif

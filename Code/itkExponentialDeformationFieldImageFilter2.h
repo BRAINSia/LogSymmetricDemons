@@ -174,7 +174,7 @@ private:
 } // end namespace itk
 
 #ifndef ITK_MANUAL_INSTANTIATION
-#include "itkExponentialDeformationFieldImageFilter2.txx"
+#include "itkExponentialDeformationFieldImageFilter2.hxx"
 #endif
 
 #endif

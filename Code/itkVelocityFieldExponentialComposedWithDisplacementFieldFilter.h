@@ -91,7 +91,7 @@ private:
 }
 
 #ifndef ITK_MANUAL_INSTANTIATION
-#include "itkVelocityFieldExponentialComposedWithDisplacementFieldFilter.txx"
+#include "itkVelocityFieldExponentialComposedWithDisplacementFieldFilter.hxx"
 #endif
 
 #endif

@@ -321,7 +321,7 @@ private:
 } // end namespace itk
 
 #ifndef ITK_MANUAL_INSTANTIATION
-#include "itkLogDomainDeformableRegistrationFilter.txx"
+#include "itkLogDomainDeformableRegistrationFilter.hxx"
 #endif
 
 #endif

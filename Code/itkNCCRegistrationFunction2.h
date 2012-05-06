@@ -192,7 +192,7 @@ private:
 } // end namespace itk
 
 #ifndef ITK_MANUAL_INSTANTIATION
-#include "itkNCCRegistrationFunction2.txx"
+#include "itkNCCRegistrationFunction2.hxx"
 #endif
 
 #endif

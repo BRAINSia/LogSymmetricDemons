@@ -187,7 +187,7 @@ private:
 } // end namespace itk
 
 #ifndef ITK_MANUAL_INSTANTIATION
-#include "itkTransformToVelocityFieldSource.txx"
+#include "itkTransformToVelocityFieldSource.hxx"
 #endif
 
 #endif // end #ifndef __itkTransformToVelocityFieldSource_h
