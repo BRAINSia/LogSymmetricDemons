@@ -20,34 +20,34 @@ namespace itk
  * \author Pierre Fillard, INRIA Paris
  */
 
-template< class TInputImage, class TOutputImage >
-class ITK_EXPORT DisplacementToVelocityFieldLogFilter:
-  public ImageToImageFilter< TInputImage, TOutputImage >
+template <class TInputImage, class TOutputImage>
+class ITK_EXPORT DisplacementToVelocityFieldLogFilter :
+  public ImageToImageFilter<TInputImage, TOutputImage>
 {
 public:
-  typedef DisplacementToVelocityFieldLogFilter            Self;
-  typedef ImageToImageFilter< TInputImage, TOutputImage > Superclass;
-  typedef SmartPointer< Self >                            Pointer;
-  typedef SmartPointer< const Self >                      ConstPointer;
+  typedef DisplacementToVelocityFieldLogFilter          Self;
+  typedef ImageToImageFilter<TInputImage, TOutputImage> Superclass;
+  typedef SmartPointer<Self>                            Pointer;
+  typedef SmartPointer<const Self>                      ConstPointer;
 
-  itkNewMacro  (Self);
-  itkTypeMacro (DisplacementToVelocityFieldLogFilter, ImageToImageFilter);
+  itkNewMacro(Self);
+  itkTypeMacro(DisplacementToVelocityFieldLogFilter, ImageToImageFilter);
 
   typedef TInputImage  InputImageType;
   typedef TOutputImage OutputImageType;
 
-  typedef VelocityFieldBCHCompositionFilter< OutputImageType, OutputImageType > BCHFilterType;
-  typedef VelocityFieldExponentialComposedWithDisplacementFieldFilter< TOutputImage, TInputImage, TInputImage >
+  typedef VelocityFieldBCHCompositionFilter<OutputImageType, OutputImageType> BCHFilterType;
+  typedef VelocityFieldExponentialComposedWithDisplacementFieldFilter<TOutputImage, TInputImage, TInputImage>
   ExponentialCompositionFilterType;
 
   /** Gaussian filtering type. */
-  typedef itk::RecursiveGaussianImageFilter< TOutputImage, TOutputImage >
+  typedef itk::RecursiveGaussianImageFilter<TOutputImage, TOutputImage>
   GaussianFilterType;
 
-  itkSetMacro (NumberOfIterations, unsigned int);
-  itkGetMacro (NumberOfIterations, unsigned int);
+  itkSetMacro(NumberOfIterations, unsigned int);
+  itkGetMacro(NumberOfIterations, unsigned int);
 
-  itkGetMacro (ElapsedIterations, unsigned int);
+  itkGetMacro(ElapsedIterations, unsigned int);
 
   /**
    *  Set/Get the number of integration steps when computing the exponential
@@ -55,12 +55,12 @@ public:
    */
   void         SetNumberOfExponentialIntegrationSteps(unsigned int n)
   {
-    m_ExpComp->SetNumberOfIntegrationSteps (n);
+    m_ExpComp->SetNumberOfIntegrationSteps(n);
   }
 
   unsigned int GetNumberOfExponentialIntegrationSteps(void) const
   {
-    return m_ExpComp->GetNumberOfIntegrationSteps ();
+    return m_ExpComp->GetNumberOfIntegrationSteps();
   }
 
   /**
@@ -80,16 +80,16 @@ public:
    *  Smoothing the velocity field improves stability with large
    *  deformations (but decreases accuracy).
    */
-  itkSetMacro     (SmoothVelocityField, bool);
-  itkGetMacro     (SmoothVelocityField, bool);
-  itkBooleanMacro (SmoothVelocityField);
+  itkSetMacro(SmoothVelocityField, bool);
+  itkGetMacro(SmoothVelocityField, bool);
+  itkBooleanMacro(SmoothVelocityField);
 
   void SetSigma(double sigma)
   {
-    m_LeftSmootherX->SetSigma (sigma);
-    m_LeftSmootherY->SetSigma (sigma);
-    m_RightSmootherX->SetSigma (sigma);
-    m_RightSmootherY->SetSigma (sigma);
+    m_LeftSmootherX->SetSigma(sigma);
+    m_LeftSmootherY->SetSigma(sigma);
+    m_RightSmootherX->SetSigma(sigma);
+    m_RightSmootherY->SetSigma(sigma);
   }
 
   double GetSigma(void) const
@@ -99,12 +99,14 @@ public:
 
 protected:
   DisplacementToVelocityFieldLogFilter();
-  ~DisplacementToVelocityFieldLogFilter(){}
+  ~DisplacementToVelocityFieldLogFilter()
+  {
+  }
 
   void GenerateData(void);
 
 private:
-  DisplacementToVelocityFieldLogFilter (const Self &);
+  DisplacementToVelocityFieldLogFilter(const Self &);
   void operator=(const Self &);
 
   unsigned int m_NumberOfIterations;

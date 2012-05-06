@@ -13,18 +13,19 @@
 
 #include "vnl/vnl_math.h"
 
-namespace itk {
+namespace itk
+{
 
 // Default constructor
 template <class TFixedImage, class TMovingImage, class TField>
-LogDomainDeformableRegistrationFilter<TFixedImage,TMovingImage,TField>
+LogDomainDeformableRegistrationFilter<TFixedImage, TMovingImage, TField>
 ::LogDomainDeformableRegistrationFilter()
 {
- 
+
   this->SetNumberOfRequiredInputs(2);
 
   this->SetNumberOfIterations(10);
- 
+
   unsigned int j;
   for( j = 0; j < ImageDimension; j++ )
     {
@@ -42,83 +43,77 @@ LogDomainDeformableRegistrationFilter<TFixedImage,TMovingImage,TField>
 
   m_Exponentiator = FieldExponentiatorType::New();
   m_Exponentiator->ComputeInverseOff();
-  
+
   m_InverseExponentiator = FieldExponentiatorType::New();
   m_InverseExponentiator->ComputeInverseOn();
 }
 
-
 // Set the fixed image.
 template <class TFixedImage, class TMovingImage, class TField>
 void
-LogDomainDeformableRegistrationFilter<TFixedImage,TMovingImage,TField>
+LogDomainDeformableRegistrationFilter<TFixedImage, TMovingImage, TField>
 ::SetFixedImage(
   const FixedImageType * ptr )
 {
-  this->ProcessObject::SetNthInput( 1, const_cast< FixedImageType * >( ptr ) );
+  this->ProcessObject::SetNthInput( 1, const_cast<FixedImageType *>( ptr ) );
 }
-
 
 // Get the fixed image.
 template <class TFixedImage, class TMovingImage, class TField>
-const typename LogDomainDeformableRegistrationFilter<TFixedImage,TMovingImage,TField>
-::FixedImageType *
-LogDomainDeformableRegistrationFilter<TFixedImage,TMovingImage,TField>
+const typename LogDomainDeformableRegistrationFilter<TFixedImage, TMovingImage, TField>
+::FixedImageType
+* LogDomainDeformableRegistrationFilter<TFixedImage, TMovingImage, TField>
 ::GetFixedImage() const
-{
-  return dynamic_cast< const FixedImageType * >
-    ( this->ProcessObject::GetInput( 1 ) );
-}
-
+  {
+  return dynamic_cast<const FixedImageType *>
+         ( this->ProcessObject::GetInput( 1 ) );
+  }
 
 // Set the moving image.
 template <class TFixedImage, class TMovingImage, class TField>
 void
-LogDomainDeformableRegistrationFilter<TFixedImage,TMovingImage,TField>
+LogDomainDeformableRegistrationFilter<TFixedImage, TMovingImage, TField>
 ::SetMovingImage(
   const MovingImageType * ptr )
 {
-  this->ProcessObject::SetNthInput( 2, const_cast< MovingImageType * >( ptr ) );
+  this->ProcessObject::SetNthInput( 2, const_cast<MovingImageType *>( ptr ) );
 }
-
 
 // Get the moving image.
 template <class TFixedImage, class TMovingImage, class TField>
-const typename LogDomainDeformableRegistrationFilter<TFixedImage,TMovingImage,TField>
-::MovingImageType *
-LogDomainDeformableRegistrationFilter<TFixedImage,TMovingImage,TField>
+const typename LogDomainDeformableRegistrationFilter<TFixedImage, TMovingImage, TField>
+::MovingImageType
+* LogDomainDeformableRegistrationFilter<TFixedImage, TMovingImage, TField>
 ::GetMovingImage() const
-{
-  return dynamic_cast< const MovingImageType * >
-    ( this->ProcessObject::GetInput( 2 ) );
-}
-
+  {
+  return dynamic_cast<const MovingImageType *>
+         ( this->ProcessObject::GetInput( 2 ) );
+  }
 
 template <class TFixedImage, class TMovingImage, class TField>
 std::vector<SmartPointer<DataObject> >::size_type
-LogDomainDeformableRegistrationFilter<TFixedImage,TMovingImage,TField>
+LogDomainDeformableRegistrationFilter<TFixedImage, TMovingImage, TField>
 ::GetNumberOfValidRequiredInputs() const
 {
   typename std::vector<SmartPointer<DataObject> >::size_type num = 0;
 
-  if (this->GetFixedImage())
+  if( this->GetFixedImage() )
     {
     num++;
     }
 
-  if (this->GetMovingImage())
+  if( this->GetMovingImage() )
     {
     num++;
     }
-  
+
   return num;
 }
-
 
 // Set the standard deviations.
 template <class TFixedImage, class TMovingImage, class TField>
 void
-LogDomainDeformableRegistrationFilter<TFixedImage,TMovingImage,TField>
+LogDomainDeformableRegistrationFilter<TFixedImage, TMovingImage, TField>
 ::SetStandardDeviations(
   double value )
 {
@@ -145,7 +140,7 @@ LogDomainDeformableRegistrationFilter<TFixedImage,TMovingImage,TField>
 // Set the standard deviations.
 template <class TFixedImage, class TMovingImage, class TField>
 void
-LogDomainDeformableRegistrationFilter<TFixedImage,TMovingImage,TField>
+LogDomainDeformableRegistrationFilter<TFixedImage, TMovingImage, TField>
 ::SetUpdateFieldStandardDeviations(
   double value )
 {
@@ -169,11 +164,10 @@ LogDomainDeformableRegistrationFilter<TFixedImage,TMovingImage,TField>
 
 }
 
-
 // Standard PrintSelf method.
 template <class TFixedImage, class TMovingImage, class TField>
 void
-LogDomainDeformableRegistrationFilter<TFixedImage,TMovingImage,TField>
+LogDomainDeformableRegistrationFilter<TFixedImage, TMovingImage, TField>
 ::PrintSelf(std::ostream& os, Indent indent) const
 {
   Superclass::PrintSelf(os, indent);
@@ -207,16 +201,15 @@ LogDomainDeformableRegistrationFilter<TFixedImage,TMovingImage,TField>
 
 }
 
-
 // Set the function state values before each iteration
 template <class TFixedImage, class TMovingImage, class TField>
 void
-LogDomainDeformableRegistrationFilter<TFixedImage,TMovingImage,TField>
+LogDomainDeformableRegistrationFilter<TFixedImage, TMovingImage, TField>
 ::InitializeIteration()
 {
-  //std::cout<<"LogDomainDeformableRegistrationFilter::InitializeIteration"<<std::endl;
+  // std::cout<<"LogDomainDeformableRegistrationFilter::InitializeIteration"<<std::endl;
   MovingImageConstPointer movingPtr = this->GetMovingImage();
-  FixedImageConstPointer fixedPtr = this->GetFixedImage();
+  FixedImageConstPointer  fixedPtr = this->GetFixedImage();
 
   if( !movingPtr || !fixedPtr )
     {
@@ -224,13 +217,13 @@ LogDomainDeformableRegistrationFilter<TFixedImage,TMovingImage,TField>
     }
 
   // update variables in the equation object
-  PDEDeformableRegistrationFunctionType *f = 
+  PDEDeformableRegistrationFunctionType *f =
     dynamic_cast<PDEDeformableRegistrationFunctionType *>
-    (this->GetDifferenceFunction().GetPointer());
+    (this->GetDifferenceFunction().GetPointer() );
 
-  if ( !f )
+  if( !f )
     {
-    itkExceptionMacro(<<"FiniteDifferenceFunction not of type LogDomainDeformableRegistrationFilterFunction");
+    itkExceptionMacro(<< "FiniteDifferenceFunction not of type LogDomainDeformableRegistrationFilterFunction");
     }
 
   f->SetFixedImage( fixedPtr );
@@ -240,19 +233,18 @@ LogDomainDeformableRegistrationFilter<TFixedImage,TMovingImage,TField>
 
 }
 
-
-/* Override the default implementation for the case when the 
+/* Override the default implementation for the case when the
  * initial velocity is not set.
  * If the initial velocity is not set, the output is
  * fill with zero vectors.*/
 template <class TFixedImage, class TMovingImage, class TField>
 void
-LogDomainDeformableRegistrationFilter<TFixedImage,TMovingImage,TField>
+LogDomainDeformableRegistrationFilter<TFixedImage, TMovingImage, TField>
 ::CopyInputToOutput()
 {
 
   typename Superclass::InputImageType::ConstPointer  inputPtr  = this->GetInput();
-  
+
   if( inputPtr )
     {
     this->Superclass::CopyInputToOutput();
@@ -266,10 +258,10 @@ LogDomainDeformableRegistrationFilter<TFixedImage,TMovingImage,TField>
       }
 
     typename OutputImageType::Pointer output = this->GetOutput();
-  
-    ImageRegionIterator<OutputImageType> out(output, output->GetRequestedRegion());
 
-    while( ! out.IsAtEnd() )
+    ImageRegionIterator<OutputImageType> out(output, output->GetRequestedRegion() );
+
+    while( !out.IsAtEnd() )
       {
       out.Value() =  zeros;
       ++out;
@@ -277,13 +269,12 @@ LogDomainDeformableRegistrationFilter<TFixedImage,TMovingImage,TField>
     }
 }
 
-
 template <class TFixedImage, class TMovingImage, class TField>
 void
-LogDomainDeformableRegistrationFilter<TFixedImage,TMovingImage,TField>
+LogDomainDeformableRegistrationFilter<TFixedImage, TMovingImage, TField>
 ::GenerateOutputInformation()
 {
-  //std::cout<<"LogDomainDeformableRegistrationFilter::GenerateOutputInformation"<<std::endl;
+  // std::cout<<"LogDomainDeformableRegistrationFilter::GenerateOutputInformation"<<std::endl;
   typename DataObject::Pointer output;
 
   if( this->GetInput(0) )
@@ -295,47 +286,46 @@ LogDomainDeformableRegistrationFilter<TFixedImage,TMovingImage,TField>
     }
   else if( this->GetFixedImage() )
     {
-    // Initial deforamtion field is not set. 
+    // Initial deforamtion field is not set.
     // Copy information from the fixed image.
-    for (unsigned int idx = 0; idx < 
-           this->GetNumberOfOutputs(); ++idx )
+    for( unsigned int idx = 0; idx <
+         this->GetNumberOfOutputs(); ++idx )
       {
       output = this->GetOutput(idx);
-      if (output)
+      if( output )
         {
-        output->CopyInformation(this->GetFixedImage());
-        }  
+        output->CopyInformation(this->GetFixedImage() );
+        }
       }
 
     }
 
 }
 
-
 template <class TFixedImage, class TMovingImage, class TField>
 void
-LogDomainDeformableRegistrationFilter<TFixedImage,TMovingImage,TField>
+LogDomainDeformableRegistrationFilter<TFixedImage, TMovingImage, TField>
 ::GenerateInputRequestedRegion()
 {
-  //std::cout<<"LogDomainDeformableRegistrationFilter::GenerateInputRequestedRegion"<<std::endl;
+  // std::cout<<"LogDomainDeformableRegistrationFilter::GenerateInputRequestedRegion"<<std::endl;
   // call the superclass's implementation
   Superclass::GenerateInputRequestedRegion();
 
   // request the largest possible region for the moving image
-  MovingImagePointer movingPtr = 
-    const_cast< MovingImageType * >( this->GetMovingImage() );
+  MovingImagePointer movingPtr =
+    const_cast<MovingImageType *>( this->GetMovingImage() );
   if( movingPtr )
     {
     movingPtr->SetRequestedRegionToLargestPossibleRegion();
     }
-  
+
   // just propagate up the output requested region for
   // the fixed image and initial velocity field.
-  VelocityFieldPointer inputPtr = 
-    const_cast< VelocityFieldType * >( this->GetInput() );
+  VelocityFieldPointer inputPtr =
+    const_cast<VelocityFieldType *>( this->GetInput() );
   VelocityFieldPointer outputPtr = this->GetOutput();
-  FixedImagePointer fixedPtr = 
-    const_cast< FixedImageType *>( this->GetFixedImage() );
+  FixedImagePointer    fixedPtr =
+    const_cast<FixedImageType *>( this->GetFixedImage() );
 
   if( inputPtr )
     {
@@ -348,34 +338,31 @@ LogDomainDeformableRegistrationFilter<TFixedImage,TMovingImage,TField>
     }
 }
 
-
 // Release memory of internal buffers
 template <class TFixedImage, class TMovingImage, class TField>
 void
-LogDomainDeformableRegistrationFilter<TFixedImage,TMovingImage,TField>
+LogDomainDeformableRegistrationFilter<TFixedImage, TMovingImage, TField>
 ::PostProcessOutput()
 {
   this->Superclass::PostProcessOutput();
   m_TempField->Initialize();
 }
 
-
 // Initialize flags
 template <class TFixedImage, class TMovingImage, class TField>
 void
-LogDomainDeformableRegistrationFilter<TFixedImage,TMovingImage,TField>
+LogDomainDeformableRegistrationFilter<TFixedImage, TMovingImage, TField>
 ::Initialize()
 {
-  //std::cout<<"LogDomainDeformableRegistrationFilter::Initialize"<<std::endl;
+  // std::cout<<"LogDomainDeformableRegistrationFilter::Initialize"<<std::endl;
   this->Superclass::Initialize();
   m_StopRegistrationFlag = false;
 }
 
-
 // Smooth velocity using a separable Gaussian kernel
 template <class TFixedImage, class TMovingImage, class TField>
 void
-LogDomainDeformableRegistrationFilter<TFixedImage,TMovingImage,TField>
+LogDomainDeformableRegistrationFilter<TFixedImage, TMovingImage, TField>
 ::SmoothVelocityField()
 {
   // The output buffer will be overwritten with new data.
@@ -385,34 +372,33 @@ LogDomainDeformableRegistrationFilter<TFixedImage,TMovingImage,TField>
 // Smooth update field using a separable Gaussian kernel
 template <class TFixedImage, class TMovingImage, class TField>
 void
-LogDomainDeformableRegistrationFilter<TFixedImage,TMovingImage,TField>
+LogDomainDeformableRegistrationFilter<TFixedImage, TMovingImage, TField>
 ::SmoothUpdateField()
 {
   // The update buffer will be overwritten with new data.
   this->SmoothGivenField(this->GetUpdateBuffer(), this->m_UpdateFieldStandardDeviations);
 }
 
-
 // Smooth velocity using a separable Gaussian kernel
 template <class TFixedImage, class TMovingImage, class TField>
 void
-LogDomainDeformableRegistrationFilter<TFixedImage,TMovingImage,TField>
+LogDomainDeformableRegistrationFilter<TFixedImage, TMovingImage, TField>
 ::SmoothGivenField(VelocityFieldType * field, const double StandardDeviations[ImageDimension])
 {
   // copy field to TempField
   m_TempField->SetOrigin( field->GetOrigin() );
   m_TempField->SetSpacing( field->GetSpacing() );
   m_TempField->SetDirection( field->GetDirection() );
-  m_TempField->SetLargestPossibleRegion( 
+  m_TempField->SetLargestPossibleRegion(
     field->GetLargestPossibleRegion() );
   m_TempField->SetRequestedRegion(
     field->GetRequestedRegion() );
   m_TempField->SetBufferedRegion( field->GetBufferedRegion() );
   m_TempField->Allocate();
-  
-  typedef typename VelocityFieldType::PixelType       VectorType;
-  typedef typename VectorType::ValueType              ScalarType;
-  typedef GaussianOperator<ScalarType,ImageDimension> OperatorType;
+
+  typedef typename VelocityFieldType::PixelType        VectorType;
+  typedef typename VectorType::ValueType               ScalarType;
+  typedef GaussianOperator<ScalarType, ImageDimension> OperatorType;
   typedef VectorNeighborhoodOperatorImageFilter<
     VelocityFieldType,
     VelocityFieldType>                                SmootherType;
@@ -420,13 +406,12 @@ LogDomainDeformableRegistrationFilter<TFixedImage,TMovingImage,TField>
   OperatorType * oper = new OperatorType;
   typename SmootherType::Pointer smoother = SmootherType::New();
 
-  typedef typename VelocityFieldType::PixelContainerPointer 
-    PixelContainerPointer;
+  typedef typename VelocityFieldType::PixelContainerPointer
+  PixelContainerPointer;
   PixelContainerPointer swapPtr;
 
   // graft the output field onto the mini-pipeline
   smoother->GraftOutput( m_TempField );
-
   for( unsigned int j = 0; j < ImageDimension; j++ )
     {
     // smooth along this dimension
@@ -442,7 +427,7 @@ LogDomainDeformableRegistrationFilter<TFixedImage,TMovingImage,TField>
     smoother->SetInput( field );
     smoother->Update();
 
-    if ( j < ImageDimension - 1 )
+    if( j < ImageDimension - 1 )
       {
       // swap the containers
       swapPtr = smoother->GetOutput()->GetPixelContainer();
@@ -467,34 +452,31 @@ LogDomainDeformableRegistrationFilter<TFixedImage,TMovingImage,TField>
 
 }
 
-
 template <class TFixedImage, class TMovingImage, class TField>
-typename LogDomainDeformableRegistrationFilter<TFixedImage,TMovingImage,TField>
+typename LogDomainDeformableRegistrationFilter<TFixedImage, TMovingImage, TField>
 ::DeformationFieldPointer
-LogDomainDeformableRegistrationFilter<TFixedImage,TMovingImage,TField>
+LogDomainDeformableRegistrationFilter<TFixedImage, TMovingImage, TField>
 ::GetDeformationField()
 {
-  //std::cout<<"LogDomainDeformableRegistration::GetDeformationField"<<std::endl;
+  // std::cout<<"LogDomainDeformableRegistration::GetDeformationField"<<std::endl;
   m_Exponentiator->SetInput( this->GetVelocityField() );
   m_Exponentiator->GetOutput()->SetRequestedRegion( this->GetVelocityField()->GetRequestedRegion() );
   m_Exponentiator->Update();
   return m_Exponentiator->GetOutput();
 }
 
-
 template <class TFixedImage, class TMovingImage, class TField>
-typename LogDomainDeformableRegistrationFilter<TFixedImage,TMovingImage,TField>
+typename LogDomainDeformableRegistrationFilter<TFixedImage, TMovingImage, TField>
 ::DeformationFieldPointer
-LogDomainDeformableRegistrationFilter<TFixedImage,TMovingImage,TField>
+LogDomainDeformableRegistrationFilter<TFixedImage, TMovingImage, TField>
 ::GetInverseDeformationField()
 {
-  //std::cout<<"LogDomainDeformableRegistration::GetInverseDeformationField"<<std::endl;
+  // std::cout<<"LogDomainDeformableRegistration::GetInverseDeformationField"<<std::endl;
   m_InverseExponentiator->SetInput( this->GetVelocityField() );
   m_InverseExponentiator->GetOutput()->SetRequestedRegion( this->GetVelocityField()->GetRequestedRegion() );
   m_InverseExponentiator->Update();
   return m_InverseExponentiator->GetOutput();
 }
-
 
 } // end namespace itk
 

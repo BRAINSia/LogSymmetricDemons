@@ -9,13 +9,13 @@
 #include "itkResampleImageFilter.h"
 #include "itkTransformToVelocityFieldSource.h"
 
-
-int main(int, char* [] )
+int main(int, char * [] )
 {
   /** Typedefs. */
   const unsigned int Dimension = 2;
-  typedef float                            ScalarPixelType;
-  typedef double                           CoordRepresentationType;
+
+  typedef float  ScalarPixelType;
+  typedef double CoordRepresentationType;
 
   typedef itk::Vector<
     ScalarPixelType, Dimension>            VectorPixelType;
@@ -33,7 +33,7 @@ int main(int, char* [] )
     CoordRepresentationType, Dimension>    AffineTransformType;
 
   typedef AffineTransformType::ParametersType
-                                           ParametersType;
+  ParametersType;
 
   typedef itk::TransformToVelocityFieldSource<
     VelocityFieldType,
@@ -77,8 +77,8 @@ int main(int, char* [] )
 
   /** Set the options. */
   PointType center;
-  center[0] = origin[0] + spacing[0]*size[0]/2.0;
-  center[1] = origin[1] + spacing[1]*size[1]/2.0;
+  center[0] = origin[0] + spacing[0] * size[0] / 2.0;
+  center[1] = origin[1] + spacing[1] * size[1] / 2.0;
   affinetransform->SetCenter( center );
 
   /** Create and set parameters. */
@@ -87,10 +87,10 @@ int main(int, char* [] )
   parameters[1] =  0.1;
   parameters[2] =  -0.3;
   parameters[3] =  0.9;
-  
+
   parameters[4] =  -2;
   parameters[5] =  3;
-  
+
   affinetransform->SetParameters( parameters );
 
   /** Create and setup velocity field generator. */
@@ -106,7 +106,7 @@ int main(int, char* [] )
     {
     velGenerator->Update();
     }
-  catch ( itk::ExceptionObject & e )
+  catch( itk::ExceptionObject & e )
     {
     std::cerr << "Exception detected while generating velocity field";
     std::cerr << " : "  << e.GetDescription();
@@ -115,13 +115,13 @@ int main(int, char* [] )
 
   /** Create and setup exponential filter. */
   ExponentialFieldFilterType::Pointer exponentiator
-     = ExponentialFieldFilterType::New();
+    = ExponentialFieldFilterType::New();
   exponentiator->SetInput( velGenerator->GetOutput() );
   try
     {
     exponentiator->Update();
     }
-  catch ( itk::ExceptionObject & e )
+  catch( itk::ExceptionObject & e )
     {
     std::cerr << "Exception detected while generating deformation field";
     std::cerr << " : "  << e.GetDescription();
@@ -129,40 +129,39 @@ int main(int, char* [] )
     }
 
   DeformationFieldType::ConstPointer deffield = exponentiator->GetOutput();
-  
+
   /** Compare the results. */
-  typedef itk::ImageRegionConstIteratorWithIndex<DeformationFieldType>  IteratorType;
+  typedef itk::ImageRegionConstIteratorWithIndex<DeformationFieldType> IteratorType;
   IteratorType it( deffield, region );
 
   PointType pt;
-  double diff = 0.0;
+  double    diff = 0.0;
 
   it.GoToBegin();
   while( !it.IsAtEnd() )
     {
     deffield->TransformIndexToPhysicalPoint(it.GetIndex(), pt);
-    
+
     const PointType warppt = pt + it.Value();
     const PointType trsfpt = affinetransform->TransformPoint(pt);
 
-    //std::cout << it.GetIndex()<< " - " << pt << ": "
+    // std::cout << it.GetIndex()<< " - " << pt << ": "
     //          << trsfpt << " => " << warppt << std::endl;
-    
-    diff += (warppt-trsfpt).GetSquaredNorm();
-    
+
+    diff += (warppt - trsfpt).GetSquaredNorm();
+
     ++it;
     }
 
-  diff = vcl_sqrt(diff/region.GetNumberOfPixels());
+  diff = vcl_sqrt(diff / region.GetNumberOfPixels() );
 
-  std::cout<<"Mean error (affine): "<<diff<<std::endl;
+  std::cout << "Mean error (affine): " << diff << std::endl;
 
-  if ( diff >= 0.3 )
+  if( diff >= 0.3 )
     {
-    std::cout<<"Test failed"<<std::endl;
+    std::cout << "Test failed" << std::endl;
     return EXIT_FAILURE;
     }
-
 
   /* Redo the test with a simple translation transform. */
   TranslationTransformType::Pointer translationtransform = TranslationTransformType::New();
@@ -175,7 +174,7 @@ int main(int, char* [] )
     {
     exponentiator->Update();
     }
-  catch ( itk::ExceptionObject & e )
+  catch( itk::ExceptionObject & e )
     {
     std::cerr << "Exception detected while generating deformation field";
     std::cerr << " : "  << e.GetDescription();
@@ -183,7 +182,7 @@ int main(int, char* [] )
     }
 
   deffield = exponentiator->GetOutput();
-  
+
   it = IteratorType( deffield, region );
 
   diff = 0.0;
@@ -192,28 +191,28 @@ int main(int, char* [] )
   while( !it.IsAtEnd() )
     {
     deffield->TransformIndexToPhysicalPoint(it.GetIndex(), pt);
-    
+
     const PointType warppt = pt + it.Value();
     const PointType trsfpt = translationtransform->TransformPoint(pt);
 
-    //std::cout << it.GetIndex()<< " - " << pt << ": "
+    // std::cout << it.GetIndex()<< " - " << pt << ": "
     //          << trsfpt << " => " << warppt << std::endl;
-    
-    diff += (warppt-trsfpt).GetSquaredNorm();
-    
+
+    diff += (warppt - trsfpt).GetSquaredNorm();
+
     ++it;
     }
 
-  diff = vcl_sqrt(diff/region.GetNumberOfPixels());
+  diff = vcl_sqrt(diff / region.GetNumberOfPixels() );
 
-  std::cout<<"Mean error (translation): "<<diff<<std::endl;
+  std::cout << "Mean error (translation): " << diff << std::endl;
 
-  if ( diff >= 0.01 )
+  if( diff >= 0.01 )
     {
-    std::cout<<"Test failed"<<std::endl;
+    std::cout << "Test failed" << std::endl;
     return EXIT_FAILURE;
     }
 
-  std::cout<<"Test passed"<<std::endl;
+  std::cout << "Test passed" << std::endl;
   return EXIT_SUCCESS;
 }

@@ -5,13 +5,12 @@
 #include <itkWarpVectorImageFilter.h>
 #include <itkAddImageFilter.h>
 
-
 namespace itk
 {
 /** \class DisplacementFieldCompositionFilter
  * \brief Compute the composition of two displacement
  * fields.
- * 
+ *
  * Given two spatial transformations fl and fr represented
  * by the displacement fields dfl and dfr, this filter computes
  * the displacment field df that represents the spatial
@@ -35,14 +34,14 @@ namespace itk
  */
 template <class TInputImage, class TOutputImage>
 class ITK_EXPORT DisplacementFieldCompositionFilter :
-  public ImageToImageFilter<TInputImage,TOutputImage>
+  public ImageToImageFilter<TInputImage, TOutputImage>
 {
 public:
   /** Standard class typedefs. */
-  typedef DisplacementFieldCompositionFilter             Self;
-  typedef ImageToImageFilter<TInputImage,TOutputImage>   Superclass;
-  typedef SmartPointer<Self>                             Pointer;
-  typedef SmartPointer<const Self>                       ConstPointer;
+  typedef DisplacementFieldCompositionFilter            Self;
+  typedef ImageToImageFilter<TInputImage, TOutputImage> Superclass;
+  typedef SmartPointer<Self>                            Pointer;
+  typedef SmartPointer<const Self>                      ConstPointer;
 
   /** InputImage type. */
   typedef typename Superclass::InputImageType         DisplacementFieldType;
@@ -57,43 +56,41 @@ public:
 
   /** Warper type. */
   typedef WarpVectorImageFilter<DisplacementFieldType,
-      DisplacementFieldType,DisplacementFieldType>     VectorWarperType;
+                                DisplacementFieldType, DisplacementFieldType>     VectorWarperType;
   typedef typename VectorWarperType::Pointer
-    VectorWarperPointer;
-  
+  VectorWarperPointer;
+
   /** Set the warper. */
   itkSetObjectMacro( Warper, VectorWarperType );
 
   /** Get the warper (can be used to change the interpolator). */
   itkGetObjectMacro( Warper, VectorWarperType );
-
-
 protected:
   DisplacementFieldCompositionFilter();
-  ~DisplacementFieldCompositionFilter() {};
+  ~DisplacementFieldCompositionFilter()
+  {
+  };
   void PrintSelf(std::ostream& os, Indent indent) const;
 
   /** GenerateData() */
   void GenerateData();
 
-  
   /** Adder type. */
-  typedef AddImageFilter<DisplacementFieldType,DisplacementFieldType,
-      DisplacementFieldType>                           AdderType;
-  typedef typename AdderType::Pointer                  AdderPointer;
+  typedef AddImageFilter<DisplacementFieldType, DisplacementFieldType,
+                         DisplacementFieldType>                           AdderType;
+  typedef typename AdderType::Pointer AdderPointer;
 
   /** Set the adder. */
   itkSetObjectMacro( Adder, AdderType );
 
   /** Get the adder. */
   itkGetObjectMacro( Adder, AdderType );
-
 private:
-  DisplacementFieldCompositionFilter(const Self&); //purposely not implemented
-  void operator=(const Self&); //purposely not implemented
+  DisplacementFieldCompositionFilter(const Self &); // purposely not implemented
+  void operator=(const Self &);                     // purposely not implemented
 
-  VectorWarperPointer        m_Warper;
-  AdderPointer               m_Adder;
+  VectorWarperPointer m_Warper;
+  AdderPointer        m_Adder;
 
 };
 

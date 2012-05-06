@@ -18,47 +18,48 @@
 #include <vnl/vnl_random.h>
 #include "itkCommand.h"
 
-
 // The following three classes are used to support callbacks
 // on the filter in the pipeline that follows later
 class ShowProgressObject
 {
 public:
   ShowProgressObject(itk::ProcessObject* o)
-    {m_Process = o;}
+  {
+    m_Process = o;
+  }
   void ShowProgress()
-    {std::cout << "Progress " << m_Process->GetProgress() << std::endl;}
+  {
+    std::cout << "Progress " << m_Process->GetProgress() << std::endl;
+  }
   itk::ProcessObject::Pointer m_Process;
 };
 
-
-
-int main(int, char* [] )
+int main(int, char * [] )
 {
   const unsigned int ImageDimension = 2;
 
-  typedef itk::Vector<float,ImageDimension> VectorType;
-  typedef itk::Image<VectorType,ImageDimension> FieldType;
+  typedef itk::Vector<float, ImageDimension>     VectorType;
+  typedef itk::Image<VectorType, ImageDimension> FieldType;
 
-  typedef FieldType::PixelType  PixelType;
-  typedef FieldType::IndexType  IndexType;
+  typedef FieldType::PixelType PixelType;
+  typedef FieldType::IndexType IndexType;
 
   typedef itk::ImageRegionIteratorWithIndex<FieldType> FieldIterator;
-  
+
   bool testPassed = true;
 
   // Random number generator
-  vnl_random rng;
+  vnl_random   rng;
   const double power = 5.0;
 
-  //=============================================================
+  // =============================================================
 
   std::cout << "Create the left deformation field." << std::endl;
-  
+
   FieldType::RegionType leftregion;
-  FieldType::SizeType leftsize = {{64, 64}};
+  FieldType::SizeType   leftsize = {{64, 64}};
   leftregion.SetSize( leftsize );
-  
+
   FieldType::Pointer leftfield = FieldType::New();
   // Set LargestPossibleRegion, BufferedRegion, and RequestedRegion simultaneously.
   leftfield->SetRegions( leftregion );
@@ -66,48 +67,44 @@ int main(int, char* [] )
 
   // Fill the field with random values
   FieldIterator leftIter( leftfield, leftfield->GetRequestedRegion() );
-  
-  for ( leftIter.GoToBegin(); !leftIter.IsAtEnd(); ++leftIter )
+  for( leftIter.GoToBegin(); !leftIter.IsAtEnd(); ++leftIter )
     {
     PixelType & value = leftIter.Value();
-    for ( unsigned int  i=0; i<ImageDimension; ++i )
+    for( unsigned int  i = 0; i < ImageDimension; ++i )
       {
-       value[i] = power * rng.normal();
+      value[i] = power * rng.normal();
       }
     }
-  
-  
-  //=============================================================
+
+  // =============================================================
 
   std::cout << "Create the right deformation field." << std::endl;
 
   FieldType::RegionType rightregion( leftregion );
-  FieldType::SizeType rightsize( leftsize );
+  FieldType::SizeType   rightsize( leftsize );
   rightregion.SetSize( rightsize );
 
   FieldType::Pointer rightfield = FieldType::New();
   // Set LargestPossibleRegion, BufferedRegion, and RequestedRegion simultaneously.
   rightfield->SetRegions( rightregion );
   rightfield->Allocate();
-  
+
   // Fill the field with random values
   FieldIterator rightIter( rightfield, rightfield->GetRequestedRegion() );
-  
-  for ( rightIter.GoToBegin(); !rightIter.IsAtEnd(); ++rightIter )
+  for( rightIter.GoToBegin(); !rightIter.IsAtEnd(); ++rightIter )
     {
     PixelType & value = rightIter.Value();
-    for ( unsigned int  i=0; i<ImageDimension; ++i )
+    for( unsigned int  i = 0; i < ImageDimension; ++i )
       {
-       value[i] = power * rng.normal();
+      value[i] = power * rng.normal();
       }
     }
 
-
-  //=============================================================
+  // =============================================================
 
   std::cout << "Smooth left and right fields." << std::endl;
 
-  typedef itk::RecursiveGaussianImageFilter< FieldType, FieldType > smootherType;
+  typedef itk::RecursiveGaussianImageFilter<FieldType, FieldType> smootherType;
 
   smootherType::Pointer smootherX = smootherType::New();
   smootherType::Pointer smootherY = smootherType::New();
@@ -117,7 +114,7 @@ int main(int, char* [] )
   smootherX->SetDirection( 0 ); // 0 --> X direction
   smootherY->SetDirection( 1 ); // 1 --> Y direction
 
-  // Set the order 
+  // Set the order
   smootherX->SetOrder( smootherType::ZeroOrder );
   smootherY->SetOrder( smootherType::ZeroOrder );
 
@@ -131,7 +128,7 @@ int main(int, char* [] )
   // Set sigma
   smootherX->SetSigma( sigma );
   smootherY->SetSigma( sigma );
-  
+
   // Trigger update
   smootherY->Update();
 
@@ -150,19 +147,18 @@ int main(int, char* [] )
   rightfield = smootherY->GetOutput();
   rightfield->DisconnectPipeline();
 
-
-  //=============================================================
+  // =============================================================
 
   std::cout << "Run VelocityFieldLieBracketFilter in standalone mode with progress.";
   std::cout << std::endl;
 
-  typedef itk::VelocityFieldLieBracketFilter<FieldType,FieldType> ComposerType;
+  typedef itk::VelocityFieldLieBracketFilter<FieldType, FieldType> ComposerType;
   ComposerType::Pointer composer = ComposerType::New();
 
   composer->SetInput( 0, leftfield );
   composer->SetInput( 1, leftfield ); // --> To check that [u,u] == 0
 
-  ShowProgressObject progressWatch(composer);
+  ShowProgressObject                                    progressWatch(composer);
   itk::SimpleMemberCommand<ShowProgressObject>::Pointer command;
   command = itk::SimpleMemberCommand<ShowProgressObject>::New();
   command->SetCallbackFunction(&progressWatch,
@@ -172,46 +168,45 @@ int main(int, char* [] )
   composer->Print( std::cout );
 
   // exercise Get methods
-  ///\todo
+  // /\todo
 
   // exercise Set methods
-  ///\todo
- 
+  // /\todo
+
   // Update the filter
   composer->Update();
 
   // Remove progress reporter
   composer->RemoveAllObservers();
-  
 
-  //=============================================================
+  // =============================================================
 
   std::cout << "Checking the output against expected." << std::endl;
 
-  std::cout << "1) Checking that [u,u] = 0." <<std::endl;
+  std::cout << "1) Checking that [u,u] = 0." << std::endl;
 
   FieldIterator outComposerIter( composer->GetOutput(),
                                  composer->GetOutput()->GetBufferedRegion() );
-  
+
   outComposerIter.GoToBegin();
   while( !outComposerIter.IsAtEnd() )
-   {
+    {
     if( ( outComposerIter.Get() ).GetNorm() != static_cast<PixelType::RealValueType>(0) )
       {
-       testPassed = false;
-       std::cout << "Failed: [u,u] != 0."<< std::endl;
-       break;
+      testPassed = false;
+      std::cout << "Failed: [u,u] != 0." << std::endl;
+      break;
       }
-    
+
     ++outComposerIter;
-   }
+    }
 
   // ------------------------------------
-  
+
   std::cout << "2) Checking that [u,v] = -[v,u]." << std::endl;
 
   ComposerType::Pointer composerBis = ComposerType::New();
-  
+
   // Computing [u,v]
   composer->SetInput( 1, rightfield );
   composer->Update();
@@ -220,21 +215,21 @@ int main(int, char* [] )
   composerBis->SetInput( 0, rightfield );
   composerBis->SetInput( 1, leftfield );
   composerBis->Update();
-  
+
   FieldIterator uvComposerIter( composer->GetOutput(),
-                      composer->GetOutput()->GetBufferedRegion() );
+                                composer->GetOutput()->GetBufferedRegion() );
   FieldIterator vuComposerIter( composerBis->GetOutput(),
-                      composerBis->GetOutput()->GetBufferedRegion() );
-  
+                                composerBis->GetOutput()->GetBufferedRegion() );
+
   // Checking that [u,v] + [v,u] = 0
   unsigned int nbPixel = 0;
-  double squareDiff = 0.0;
-  double mean = 0.0;
+  double       squareDiff = 0.0;
+  double       mean = 0.0;
   uvComposerIter.GoToBegin();
   vuComposerIter.GoToBegin();
 
   while( !uvComposerIter.IsAtEnd() )
-   {
+    {
     const FieldType::PixelType & uvVal = uvComposerIter.Get();
     const FieldType::PixelType & vuVal = vuComposerIter.Get();
 
@@ -243,43 +238,41 @@ int main(int, char* [] )
     ++uvComposerIter;
     ++vuComposerIter;
     ++nbPixel;
-   }
+    }
 
-  mean = squareDiff/(double)nbPixel;
+  mean = squareDiff / (double)nbPixel;
 
-  if ( mean > 1e-6 )
-   {
+  if( mean > 1e-6 )
+    {
     testPassed = false;
     std::cout.precision(6);
     std::cout << "Failed. Error: " << mean << std::endl;
-   }
-  
+    }
 
   // ------------------------------------
 
   std::cout << "3) Checking that [ku + u',v] = k[u,v] + [u',v]." << std::endl;
 
   double k = 5.0;
-  
+
   // Generate another deformation filter
   FieldType::RegionType leftregion2( leftregion );
-  FieldType::SizeType leftsize2( leftsize );
+  FieldType::SizeType   leftsize2( leftsize );
   leftregion2.SetSize( leftsize2 );
 
   FieldType::Pointer leftfield2 = FieldType::New();
   // Set LargestPossibleRegion, BufferedRegion, and RequestedRegion simultaneously.
   leftfield2->SetRegions( leftregion2 );
   leftfield2->Allocate();
-  
+
   // Fill the field with random values
   FieldIterator leftIter2( leftfield2, leftfield2->GetRequestedRegion() );
-  
-  for ( leftIter2.GoToBegin(); !leftIter2.IsAtEnd(); ++leftIter2 )
+  for( leftIter2.GoToBegin(); !leftIter2.IsAtEnd(); ++leftIter2 )
     {
     PixelType & value = leftIter2.Value();
-    for ( unsigned int  i=0; i<ImageDimension; ++i )
+    for( unsigned int  i = 0; i < ImageDimension; ++i )
       {
-       value[i] = power * rng.normal();
+      value[i] = power * rng.normal();
       }
     }
 
@@ -291,22 +284,22 @@ int main(int, char* [] )
   leftfield2->DisconnectPipeline();
 
   // Adder
-  typedef itk::AddImageFilter<FieldType,FieldType>  AdderType;
+  typedef itk::AddImageFilter<FieldType, FieldType> AdderType;
   AdderType::Pointer adder = AdderType::New();
   AdderType::Pointer adder2 = AdderType::New();
 
   // Multiplier
-  typedef itk::MultiplyByConstantImageFilter<FieldType,double,FieldType>   MultiplyByConstantType;
+  typedef itk::MultiplyByConstantImageFilter<FieldType, double, FieldType> MultiplyByConstantType;
   MultiplyByConstantType::Pointer multiplier = MultiplyByConstantType::New();
   MultiplyByConstantType::Pointer multiplier2 = MultiplyByConstantType::New();
- 
+
   // Composer
   ComposerType::Pointer composerTer = ComposerType::New();
 
   // Compute [ku + u',v]
   multiplier->SetConstant( k );
   multiplier->SetInput( leftfield );
-  
+
   adder->SetInput1( multiplier->GetOutput() );
   adder->SetInput2( leftfield2 );
 
@@ -330,9 +323,9 @@ int main(int, char* [] )
 
   // Check that [ku + u',v] - k[u,v] + [u',v] = 0
   FieldIterator iter1( composer->GetOutput(),
-                composer->GetOutput()->GetBufferedRegion() );
+                       composer->GetOutput()->GetBufferedRegion() );
   FieldIterator iter2( adder2->GetOutput(),
-                adder2->GetOutput()->GetBufferedRegion() );
+                       adder2->GetOutput()->GetBufferedRegion() );
 
   iter1.GoToBegin();
   iter2.GoToBegin();
@@ -340,7 +333,7 @@ int main(int, char* [] )
   squareDiff = 0.0;
 
   while( !iter1.IsAtEnd() )
-   {
+    {
     const FieldType::PixelType & val1 = iter1.Get();
     const FieldType::PixelType & val2 = iter2.Get();
 
@@ -348,112 +341,108 @@ int main(int, char* [] )
 
     ++iter1;
     ++iter2;
-   }
+    }
 
-  mean = squareDiff/(double)nbPixel;
+  mean = squareDiff / (double)nbPixel;
 
-  if ( mean > 1e-6 )
-   {
+  if( mean > 1e-6 )
+    {
     testPassed = false;
     std::cout.precision(6);
     std::cout << "Failed. Error: " << mean << std::endl;
-   }
-
+    }
 
   // ------------------------------------
-  {
-  std::cout << "4) Checking Jacobi identity [u,[v,w]] + [w,[u,v]] + [v,[w,u]] = 0." << std::endl;
-
-  FieldType::Pointer u_field = leftfield;
-  FieldType::Pointer v_field = rightfield;
-  FieldType::Pointer w_field = leftfield2;
-                                     
-  // [u,[v,w]]
-  ComposerType::Pointer vw_comp = ComposerType::New();
-  vw_comp->SetInput( 0, v_field );
-  vw_comp->SetInput( 1, w_field );
-
-  ComposerType::Pointer uvw_comp = ComposerType::New();
-  uvw_comp->SetInput( 0, u_field );
-  uvw_comp->SetInput( 1, vw_comp->GetOutput() );
-  uvw_comp->UpdateLargestPossibleRegion();
-  FieldType::Pointer uvw_field = uvw_comp->GetOutput();
-
-  // [w,[u,v]]
-  ComposerType::Pointer uv_comp = ComposerType::New();
-  uv_comp->SetInput( 0, u_field );
-  uv_comp->SetInput( 1, v_field );
-
-  ComposerType::Pointer wuv_comp = ComposerType::New();
-  wuv_comp->SetInput( 0, w_field );
-  wuv_comp->SetInput( 1, uv_comp->GetOutput() );
-  wuv_comp->UpdateLargestPossibleRegion();
-  FieldType::Pointer wuv_field = wuv_comp->GetOutput();
-
-
-  // [v,[w,u]]
-  ComposerType::Pointer wu_comp = ComposerType::New();
-  wu_comp->SetInput( 0, w_field );
-  wu_comp->SetInput( 1, u_field );
-
-  ComposerType::Pointer vwu_comp = ComposerType::New();
-  vwu_comp->SetInput( 0, v_field );
-  vwu_comp->SetInput( 1, wu_comp->GetOutput() );
-  vwu_comp->UpdateLargestPossibleRegion();
-  FieldType::Pointer vwu_field = vwu_comp->GetOutput();
-
-
-  // [u,[v,w]] + [w,[u,v]] + [v,[w,u]]
-  FieldIterator uvw_iter( uvw_field, uvw_field->GetLargestPossibleRegion() );
-  FieldIterator wuv_iter( wuv_field, wuv_field->GetLargestPossibleRegion() );
-  FieldIterator vwu_iter( vwu_field, vwu_field->GetLargestPossibleRegion() );
-
-  double uvw_energy(0.0), wuv_energy(0.0), vwu_energy(0.0), jacobi_energy(0.0);
-
-  while ( !uvw_iter.IsAtEnd() )
     {
-    uvw_energy += uvw_iter.Value().GetSquaredNorm();
-    wuv_energy += wuv_iter.Value().GetSquaredNorm();
-    vwu_energy += vwu_iter.Value().GetSquaredNorm();
-    
-    const PixelType jacobi_pix = uvw_iter.Value() + wuv_iter.Value() + vwu_iter.Value();
-    jacobi_energy += jacobi_pix.GetSquaredNorm();
-    
-    ++uvw_iter;
-    ++wuv_iter;
-    ++vwu_iter;
+    std::cout << "4) Checking Jacobi identity [u,[v,w]] + [w,[u,v]] + [v,[w,u]] = 0." << std::endl;
+
+    FieldType::Pointer u_field = leftfield;
+    FieldType::Pointer v_field = rightfield;
+    FieldType::Pointer w_field = leftfield2;
+
+    // [u,[v,w]]
+    ComposerType::Pointer vw_comp = ComposerType::New();
+    vw_comp->SetInput( 0, v_field );
+    vw_comp->SetInput( 1, w_field );
+
+    ComposerType::Pointer uvw_comp = ComposerType::New();
+    uvw_comp->SetInput( 0, u_field );
+    uvw_comp->SetInput( 1, vw_comp->GetOutput() );
+    uvw_comp->UpdateLargestPossibleRegion();
+    FieldType::Pointer uvw_field = uvw_comp->GetOutput();
+
+    // [w,[u,v]]
+    ComposerType::Pointer uv_comp = ComposerType::New();
+    uv_comp->SetInput( 0, u_field );
+    uv_comp->SetInput( 1, v_field );
+
+    ComposerType::Pointer wuv_comp = ComposerType::New();
+    wuv_comp->SetInput( 0, w_field );
+    wuv_comp->SetInput( 1, uv_comp->GetOutput() );
+    wuv_comp->UpdateLargestPossibleRegion();
+    FieldType::Pointer wuv_field = wuv_comp->GetOutput();
+
+    // [v,[w,u]]
+    ComposerType::Pointer wu_comp = ComposerType::New();
+    wu_comp->SetInput( 0, w_field );
+    wu_comp->SetInput( 1, u_field );
+
+    ComposerType::Pointer vwu_comp = ComposerType::New();
+    vwu_comp->SetInput( 0, v_field );
+    vwu_comp->SetInput( 1, wu_comp->GetOutput() );
+    vwu_comp->UpdateLargestPossibleRegion();
+    FieldType::Pointer vwu_field = vwu_comp->GetOutput();
+
+    // [u,[v,w]] + [w,[u,v]] + [v,[w,u]]
+    FieldIterator uvw_iter( uvw_field, uvw_field->GetLargestPossibleRegion() );
+    FieldIterator wuv_iter( wuv_field, wuv_field->GetLargestPossibleRegion() );
+    FieldIterator vwu_iter( vwu_field, vwu_field->GetLargestPossibleRegion() );
+
+    double uvw_energy(0.0), wuv_energy(0.0), vwu_energy(0.0), jacobi_energy(0.0);
+
+    while( !uvw_iter.IsAtEnd() )
+      {
+      uvw_energy += uvw_iter.Value().GetSquaredNorm();
+      wuv_energy += wuv_iter.Value().GetSquaredNorm();
+      vwu_energy += vwu_iter.Value().GetSquaredNorm();
+
+      const PixelType jacobi_pix = uvw_iter.Value() + wuv_iter.Value() + vwu_iter.Value();
+      jacobi_energy += jacobi_pix.GetSquaredNorm();
+
+      ++uvw_iter;
+      ++wuv_iter;
+      ++vwu_iter;
+      }
+
+    uvw_energy = std::sqrt( uvw_energy / (double)nbPixel );
+    wuv_energy = std::sqrt( wuv_energy / (double)nbPixel );
+    vwu_energy = std::sqrt( vwu_energy / (double)nbPixel );
+    jacobi_energy = std::sqrt( jacobi_energy / (double)nbPixel );
+    const double compared_energy = jacobi_energy / (uvw_energy + wuv_energy + vwu_energy);
+
+    std::cout << "  uvw_energy:    " << uvw_energy << std::endl;
+    std::cout << "  wuv_energy:    " << wuv_energy << std::endl;
+    std::cout << "  vwu_energy:    " << vwu_energy << std::endl;
+    std::cout << "  jacobi_energy: " << jacobi_energy << std::endl;
+    std::cout << "  j_e/(uvw_e+wuv_e+vwu_e): " << compared_energy << std::endl;
+
+    // Right now the test is very easy to passs
+    // It seems that the central difference scheme doen't play well
+    // with imbricated Lie brackets...
+    if( compared_energy >= 1e-1 )
+      {
+      testPassed = false;
+      std::cout << "Failed: [u,[v,w]] + [w,[u,v]] + [v,[w,u]] != 0." << std::endl;
+      }
+
     }
 
-  uvw_energy = std::sqrt( uvw_energy / (double)nbPixel );
-  wuv_energy = std::sqrt( wuv_energy / (double)nbPixel );
-  vwu_energy = std::sqrt( vwu_energy / (double)nbPixel );
-  jacobi_energy = std::sqrt( jacobi_energy / (double)nbPixel );
-  const double compared_energy = jacobi_energy / (uvw_energy + wuv_energy + vwu_energy);
-
-  std::cout << "  uvw_energy:    " << uvw_energy << std::endl;
-  std::cout << "  wuv_energy:    " << wuv_energy << std::endl;
-  std::cout << "  vwu_energy:    " << vwu_energy << std::endl;
-  std::cout << "  jacobi_energy: " << jacobi_energy << std::endl;
-  std::cout << "  j_e/(uvw_e+wuv_e+vwu_e): " << compared_energy << std::endl;
-
-  // Right now the test is very easy to passs
-  // It seems that the central difference scheme doen't play well
-  // with imbricated Lie brackets...
-  if ( compared_energy >= 1e-1 )
-    {
-    testPassed = false;
-    std::cout << "Failed: [u,[v,w]] + [w,[u,v]] + [v,[w,u]] != 0."<< std::endl;
-    }
-
-  }
-
-
-  //=============================================================
+  // =============================================================
 
   std::cout << "Run Filter with streamer";
   std::cout << std::endl;
 
-  typedef itk::VectorCastImageFilter<FieldType,FieldType> VectorCasterType;
+  typedef itk::VectorCastImageFilter<FieldType, FieldType> VectorCasterType;
   VectorCasterType::Pointer vcaster = VectorCasterType::New();
 
   vcaster->SetInput( composer->GetInput(1) );
@@ -463,22 +452,21 @@ int main(int, char* [] )
   composer2->SetInput( 0, composer->GetInput(0) );
   composer2->SetInput( 1, vcaster->GetOutput() );
 
-  typedef itk::StreamingImageFilter<FieldType,FieldType> StreamerType;
+  typedef itk::StreamingImageFilter<FieldType, FieldType> StreamerType;
   StreamerType::Pointer streamer = StreamerType::New();
   streamer->SetInput( composer2->GetOutput() );
   streamer->SetNumberOfStreamDivisions( 3 );
   streamer->Update();
 
-  
-  //=============================================================
+  // =============================================================
 
   std::cout << "Compare standalone and streamed outputs" << std::endl;
 
   FieldIterator outIter( composer->GetOutput(),
-                 composer->GetOutput()->GetBufferedRegion() );
+                         composer->GetOutput()->GetBufferedRegion() );
 
   FieldIterator streamIter( streamer->GetOutput(),
-                   streamer->GetOutput()->GetBufferedRegion() );
+                            streamer->GetOutput()->GetBufferedRegion() );
 
   outIter.GoToBegin();
   streamIter.GoToBegin();
@@ -487,21 +475,20 @@ int main(int, char* [] )
     {
     if( outIter.Get() != streamIter.Get() )
       {
-       testPassed = false;
-       std::cout << "Streaming failed." << std::endl;
-       break;
+      testPassed = false;
+      std::cout << "Streaming failed." << std::endl;
+      break;
       }
     ++outIter;
     ++streamIter;
     }
-  
 
   // Exercise error handling
-  ///\todo Implement Set/Get gradient calculators to test the following
- //  typedef ComposerType::WarpGradientCalculatorType gradientCalculatorType;
+  // /\todo Implement Set/Get gradient calculators to test the following
+  //  typedef ComposerType::WarpGradientCalculatorType gradientCalculatorType;
 //   gradientCalculatorType::Pointer leftGradCalculator = composer->GetLeftGradientCalculator();
 //   gradientCalculatorType::Pointer rightGradCalculator = composer->GetRightGradientCalculator();
- 
+
 //   try
 //     {
 //     std::cout << "Setting gradient calculators to NULL" << std::endl;
@@ -524,8 +511,7 @@ int main(int, char* [] )
 //     return EXIT_FAILURE;
 //     }
 
-
-  if ( !testPassed )
+  if( !testPassed )
     {
     std::cout << "Test failed." << std::endl;
     return EXIT_FAILURE;

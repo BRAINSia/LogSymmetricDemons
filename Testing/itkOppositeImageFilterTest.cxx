@@ -9,8 +9,8 @@
   Copyright (c) Insight Software Consortium. All rights reserved.
   See ITKCopyright.txt or http://www.itk.org/HTML/Copyright.htm for details.
 
-     This software is distributed WITHOUT ANY WARRANTY; without even 
-     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR 
+     This software is distributed WITHOUT ANY WARRANTY; without even
+     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
      PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
@@ -23,37 +23,35 @@
 #include "itkImageRegionIteratorWithIndex.h"
 #include "itkSubtractImageFilter.h"
 
-
-int main(int, char* [] )
+int main(int, char * [] )
 {
 
   // Define the dimension of the images
   const unsigned int ImageDimension = 3;
 
   // Declare the types of the images
-  typedef itk::Image<float, ImageDimension>  InputImageType;
-  typedef itk::Image<float, ImageDimension>  OutputImageType;
-  
+  typedef itk::Image<float, ImageDimension> InputImageType;
+  typedef itk::Image<float, ImageDimension> OutputImageType;
+
   // Declare Iterator types apropriated for each image
   typedef itk::ImageRegionIteratorWithIndex<
-                                  InputImageType>  InputIteratorType;
+    InputImageType>  InputIteratorType;
 
   typedef itk::ImageRegionIteratorWithIndex<
-                                  OutputImageType>  OutputIteratorType;
-
+    OutputImageType>  OutputIteratorType;
 
   // Declare the type of the index to access images
-  typedef itk::Index<ImageDimension>         IndexType;
+  typedef itk::Index<ImageDimension> IndexType;
 
   // Declare the type of the size
-  typedef itk::Size<ImageDimension>          SizeType;
+  typedef itk::Size<ImageDimension> SizeType;
 
   // Declare the type of the Region
-  typedef itk::ImageRegion<ImageDimension>   RegionType;
+  typedef itk::ImageRegion<ImageDimension> RegionType;
 
   // Create two images
   InputImageType::Pointer inputImage  = InputImageType::New();
-  
+
   // Define their size, and start index
   SizeType size;
   size[0] = 2;
@@ -91,12 +89,10 @@ int main(int, char* [] )
 
   // Declare the type for the filter
   typedef itk::OppositeImageFilter<
-    InputImageType, OutputImageType  >   FilterType;
-
+    InputImageType, OutputImageType>   FilterType;
 
   // Create a filter
   FilterType::Pointer filter = FilterType::New();
-
 
   // Connect the input images
   filter->SetInput( inputImage );
@@ -108,7 +104,7 @@ int main(int, char* [] )
   filter->Update();
 
   // Create an iterator for going through the image output
-  OutputIteratorType ot(outputImage, outputImage->GetRequestedRegion());
+  OutputIteratorType ot(outputImage, outputImage->GetRequestedRegion() );
 
   //  Check the content of the result image
   std::cout << "Verification of the output " << std::endl;
@@ -120,7 +116,7 @@ int main(int, char* [] )
     {
     const InputImageType::PixelType  input  = it.Get();
     const OutputImageType::PixelType output = ot.Get();
-    const float expectedValue = -input;
+    const float                      expectedValue = -input;
     std::cout << output << " = ";
     std::cout << expectedValue  << std::endl;
     if( fabs( expectedValue - output ) > epsilon )

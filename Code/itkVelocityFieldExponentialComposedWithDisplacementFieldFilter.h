@@ -22,18 +22,18 @@ namespace itk
    \author Pierre Fillard, INRIA Paris
  */
 
-template< class TVelocityField, class TInputDisplacementField, class TOutputDisplacementField >
-class VelocityFieldExponentialComposedWithDisplacementFieldFilter:
-  public ImageToImageFilter< TInputDisplacementField, TOutputDisplacementField >
+template <class TVelocityField, class TInputDisplacementField, class TOutputDisplacementField>
+class VelocityFieldExponentialComposedWithDisplacementFieldFilter :
+  public ImageToImageFilter<TInputDisplacementField, TOutputDisplacementField>
 {
 public:
-  typedef VelocityFieldExponentialComposedWithDisplacementFieldFilter             Self;
-  typedef ImageToImageFilter< TInputDisplacementField, TOutputDisplacementField > Superclass;
-  typedef SmartPointer< Self >                                                    Pointer;
-  typedef SmartPointer< const Self >                                              ConstPointer;
+  typedef VelocityFieldExponentialComposedWithDisplacementFieldFilter           Self;
+  typedef ImageToImageFilter<TInputDisplacementField, TOutputDisplacementField> Superclass;
+  typedef SmartPointer<Self>                                                    Pointer;
+  typedef SmartPointer<const Self>                                              ConstPointer;
 
-  itkNewMacro  (Self);
-  itkTypeMacro (VelocityFieldExponentialComposedWithDisplacementFieldFilter, ImageToImageFilter);
+  itkNewMacro(Self);
+  itkTypeMacro(VelocityFieldExponentialComposedWithDisplacementFieldFilter, ImageToImageFilter);
 
   typedef TVelocityField                        VelocityFieldType;
   typedef typename VelocityFieldType::PixelType VelocityPixelType;
@@ -48,37 +48,38 @@ public:
   typedef typename OutputImageType::PixelType  OutputPixelType;
   typedef typename OutputImageType::RegionType OutputImageRegionType;
 
-  //typedef VectorLinearInterpolateImageFunction <VelocityFieldType>
+  // typedef VectorLinearInterpolateImageFunction <VelocityFieldType>
   // VelocityFieldInterpolatorType;
-  typedef VectorLinearInterpolateNearestNeighborExtrapolateImageFunction< VelocityFieldType >
+  typedef VectorLinearInterpolateNearestNeighborExtrapolateImageFunction<VelocityFieldType>
   VelocityFieldInterpolatorType;
 
-  itkSetObjectMacro (VelocityField, VelocityFieldType);
-  itkGetObjectMacro (VelocityField, VelocityFieldType);
+  itkSetObjectMacro(VelocityField, VelocityFieldType);
+  itkGetObjectMacro(VelocityField, VelocityFieldType);
 
   /**
    * Set/Get the number of integration steps to compute the exponential
    */
-  itkSetMacro (NumberOfIntegrationSteps, int);
-  itkGetMacro (NumberOfIntegrationSteps, int);
+  itkSetMacro(NumberOfIntegrationSteps, int);
+  itkGetMacro(NumberOfIntegrationSteps, int);
 
   /**
    * If On, compute exp(-u)o\phi instead of exp(u)o\phi
    */
-  itkSetMacro      (ComputeInverse, bool);
-  itkGetConstMacro (ComputeInverse, bool);
-  itkBooleanMacro  (ComputeInverse);
+  itkSetMacro(ComputeInverse, bool);
+  itkGetConstMacro(ComputeInverse, bool);
+  itkBooleanMacro(ComputeInverse);
 protected:
   VelocityFieldExponentialComposedWithDisplacementFieldFilter();
-  ~VelocityFieldExponentialComposedWithDisplacementFieldFilter(){}
+  ~VelocityFieldExponentialComposedWithDisplacementFieldFilter()
+  {
+  }
 
   void BeforeThreadedGenerateData(void);
 
-  void ThreadedGenerateData(const OutputImageRegionType & outputRegionForThread,
-                            int threadId);
+  void ThreadedGenerateData(const OutputImageRegionType & outputRegionForThread, int threadId);
 
 private:
-  VelocityFieldExponentialComposedWithDisplacementFieldFilter (const Self &);
+  VelocityFieldExponentialComposedWithDisplacementFieldFilter(const Self &);
   void operator=(const Self &);
 
   typename VelocityFieldType::Pointer m_VelocityField;

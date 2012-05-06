@@ -22,7 +22,7 @@ namespace itk
  * to peform multi-resolution deformable registration.
  *
  * At each resolution level a LogDomainDeformableRegistrationFilter is used
- * to register two images by computing the velocity field whose exponential will 
+ * to register two images by computing the velocity field whose exponential will
  * map a moving image onto a fixed image.
  *
  * See T. Vercauteren, X. Pennec, A. Perchant and N. Ayache,
@@ -71,27 +71,27 @@ namespace itk
  */
 template <class TFixedImage, class TMovingImage, class TField, class  TRealType = float>
 class ITK_EXPORT MultiResolutionLogDomainDeformableRegistration :
-    public ImageToImageFilter <TField, TField>
+  public ImageToImageFilter<TField, TField>
 {
 public:
   /** Standard class typedefs */
   typedef MultiResolutionLogDomainDeformableRegistration Self;
   typedef ImageToImageFilter<TField, TField>
-                                                   Superclass;
-  typedef SmartPointer<Self>                       Pointer;
-  typedef SmartPointer<const Self>                 ConstPointer;
+  Superclass;
+  typedef SmartPointer<Self>       Pointer;
+  typedef SmartPointer<const Self> ConstPointer;
 
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
   /** Run-time type information (and related methods). */
-  itkTypeMacro( MultiResolutionLogDomainDeformableRegistration, 
+  itkTypeMacro( MultiResolutionLogDomainDeformableRegistration,
                 ImageToImageFilter );
 
   /** Fixed image type. */
-  typedef TFixedImage                            FixedImageType;
-  typedef typename FixedImageType::Pointer       FixedImagePointer;
-  typedef typename FixedImageType::ConstPointer  FixedImageConstPointer;
+  typedef TFixedImage                           FixedImageType;
+  typedef typename FixedImageType::Pointer      FixedImagePointer;
+  typedef typename FixedImageType::ConstPointer FixedImageConstPointer;
 
   /** Moving image type. */
   typedef TMovingImage                           MovingImageType;
@@ -99,9 +99,9 @@ public:
   typedef typename MovingImageType::ConstPointer MovingImageConstPointer;
 
   /** Velocity field type. */
-  typedef TField                                 VelocityFieldType;
-  typedef typename VelocityFieldType::Pointer    VelocityFieldPointer;
-  
+  typedef TField                              VelocityFieldType;
+  typedef typename VelocityFieldType::Pointer VelocityFieldPointer;
+
   /** Deformation field image type. */
   typedef TField                                 DeformationFieldType;
   typedef typename DeformationFieldType::Pointer DeformationFieldPointer;
@@ -111,31 +111,31 @@ public:
                       FixedImageType::ImageDimension);
 
   /** Internal float image type. */
-  typedef Image<TRealType,itkGetStaticConstMacro(ImageDimension)> FloatImageType;
+  typedef Image<TRealType, itkGetStaticConstMacro(ImageDimension)> FloatImageType;
 
   /** The internal registration type. */
-  typedef LogDomainDeformableRegistrationFilter<FloatImageType, FloatImageType, VelocityFieldType >
-                                             RegistrationType;
+  typedef LogDomainDeformableRegistrationFilter<FloatImageType, FloatImageType, VelocityFieldType>
+  RegistrationType;
   typedef typename RegistrationType::Pointer RegistrationPointer;
 
   /** The default registration type. */
   typedef LogDomainDemonsRegistrationFilter<
-    FloatImageType, FloatImageType, VelocityFieldType > DefaultRegistrationType;
+    FloatImageType, FloatImageType, VelocityFieldType> DefaultRegistrationType;
 
   /** The fixed multi-resolution image pyramid type. */
-  typedef MultiResolutionPyramidImageFilter<FixedImageType, FloatImageType >
-                                                  FixedImagePyramidType;
+  typedef MultiResolutionPyramidImageFilter<FixedImageType, FloatImageType>
+  FixedImagePyramidType;
   typedef typename FixedImagePyramidType::Pointer FixedImagePyramidPointer;
 
   /** The moving multi-resolution image pyramid type. */
-  typedef MultiResolutionPyramidImageFilter<MovingImageType, FloatImageType >
-                                                   MovingImagePyramidType;
+  typedef MultiResolutionPyramidImageFilter<MovingImageType, FloatImageType>
+  MovingImagePyramidType;
   typedef typename MovingImagePyramidType::Pointer MovingImagePyramidPointer;
-   
+
   /** The velocity field expander type. */
-  typedef VectorResampleImageFilter<VelocityFieldType, VelocityFieldType >
-                                               FieldExpanderType;
-  typedef typename FieldExpanderType::Pointer  FieldExpanderPointer;
+  typedef VectorResampleImageFilter<VelocityFieldType, VelocityFieldType>
+  FieldExpanderType;
+  typedef typename FieldExpanderType::Pointer FieldExpanderPointer;
 
   /** Set the fixed image. */
   virtual void SetFixedImage( const FixedImageType * ptr );
@@ -152,20 +152,23 @@ public:
   /** Set initial velocity field to be used as is (no smoothing, no
    *  subsampling at the coarsest level of the pyramid. */
   virtual void SetInitialVelocityField( VelocityFieldType * ptr )
-    {
-    this->m_InitialVelocityField=ptr;
-    }
+  {
+    this->m_InitialVelocityField = ptr;
+  }
 
   /** Set initial velocity field. No assumption is made on the
    *  input. It will therefore be smoothed and resampled to match the
    *  images characteristics at the coarsest level of the pyramid. */
   virtual void SetArbitraryInitialVelocityField( VelocityFieldType * ptr )
-    {
-    this->SetInput( ptr ); 
-    }
+  {
+    this->SetInput( ptr );
+  }
 
   /** Get output velocity field. */
-  VelocityFieldType * GetVelocityField() { return this->GetOutput(); }
+  VelocityFieldType * GetVelocityField()
+  {
+    return this->GetOutput();
+  }
 
   /** Get output deformation field. */
   DeformationFieldPointer GetDeformationField();
@@ -185,7 +188,7 @@ public:
 
   /** Get the internal registrator. */
   itkGetObjectMacro( RegistrationFilter, RegistrationType );
-  
+
   /** Set the fixed image pyramid. */
   itkSetObjectMacro( FixedImagePyramid, FixedImagePyramidType );
 
@@ -218,20 +221,24 @@ public:
 
   /** Get number of iterations per multi-resolution levels. */
   virtual const unsigned int * GetNumberOfIterations() const
-  { return &(m_NumberOfIterations[0]); }
+  {
+    return &(m_NumberOfIterations[0]);
+  }
 
   /** Stop the registration after the current iteration. */
   virtual void StopRegistration();
 
 protected:
   MultiResolutionLogDomainDeformableRegistration();
-  ~MultiResolutionLogDomainDeformableRegistration() {}
+  ~MultiResolutionLogDomainDeformableRegistration()
+  {
+  }
   void PrintSelf(std::ostream& os, Indent indent) const;
 
   /** Exponential type */
-  typedef ExponentialDeformationFieldImageFilter< 
-    VelocityFieldType, DeformationFieldType >      FieldExponentiatorType;
-  
+  typedef ExponentialDeformationFieldImageFilter<
+    VelocityFieldType, DeformationFieldType>      FieldExponentiatorType;
+
   typedef typename FieldExponentiatorType::Pointer FieldExponentiatorPointer;
 
   itkSetObjectMacro( Exponentiator, FieldExponentiatorType );
@@ -262,31 +269,29 @@ protected:
   virtual bool Halt();
 
 private:
-  MultiResolutionLogDomainDeformableRegistration(const Self&); //purposely not implemented
-  void operator=(const Self&); //purposely not implemented
-  
-  RegistrationPointer        m_RegistrationFilter;
-  FixedImagePyramidPointer   m_FixedImagePyramid;
-  MovingImagePyramidPointer  m_MovingImagePyramid;
-  FieldExpanderPointer       m_FieldExpander;
-  VelocityFieldPointer       m_InitialVelocityField;
+  MultiResolutionLogDomainDeformableRegistration(const Self &); // purposely not implemented
+  void operator=(const Self &);                                 // purposely not implemented
 
-  unsigned int               m_NumberOfLevels;
-  unsigned int               m_CurrentLevel;
-  std::vector<unsigned int>  m_NumberOfIterations;
+  RegistrationPointer       m_RegistrationFilter;
+  FixedImagePyramidPointer  m_FixedImagePyramid;
+  MovingImagePyramidPointer m_MovingImagePyramid;
+  FieldExpanderPointer      m_FieldExpander;
+  VelocityFieldPointer      m_InitialVelocityField;
+
+  unsigned int              m_NumberOfLevels;
+  unsigned int              m_CurrentLevel;
+  std::vector<unsigned int> m_NumberOfIterations;
 
   /** Flag to indicate user stop registration request. */
-  bool                      m_StopRegistrationFlag;
+  bool m_StopRegistrationFlag;
 
   FieldExponentiatorPointer m_Exponentiator;
 };
-
 
 } // end namespace itk
 
 #ifndef ITK_MANUAL_INSTANTIATION
 #include "itkMultiResolutionLogDomainDeformableRegistration.txx"
 #endif
-
 
 #endif
