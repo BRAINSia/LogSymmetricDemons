@@ -73,11 +73,7 @@ endif(NOT ITK_USE_REVIEW)
 #-----------------------------------------------------------------------------
 #Set any libraries that your project depends on.
 #examples: ITKCommon, VTKRendering, etc
-set(Libraries
-  ITKCommon
-  ITKIO
-  ITKStatistics
-  )
+set(Libraries ${ITK_LIBRARIES})
 
 
 #-----------------------------------------------------------------------------
@@ -129,8 +125,6 @@ add_subdirectory(Applications)
 set(CPACK_PACKAGE_VERSION_MAJOR "0")
 set(CPACK_PACKAGE_VERSION_MINOR "0")
 set(CPACK_PACKAGE_VERSION_PATCH "5")
-
-include(CPack)
 
 set(CPACK_SOURCE_IGNORE_FILES
   ${CPACK_SOURCE_IGNORE_FILES}
