@@ -76,7 +76,7 @@ protected:
 
   void BeforeThreadedGenerateData(void);
 
-  void ThreadedGenerateData(const OutputImageRegionType & outputRegionForThread, int threadId);
+  void ThreadedGenerateData(const OutputImageRegionType & outputRegionForThread, ThreadIdType threadId);
 
 private:
   VelocityFieldExponentialComposedWithDisplacementFieldFilter(const Self &);

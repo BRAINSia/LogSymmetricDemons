@@ -36,6 +36,9 @@ public:
 
 int main(int, char * [] )
 {
+  bool testPassed = true;
+  try
+    {
   const unsigned int ImageDimension = 2;
 
   typedef itk::Vector<float, ImageDimension>     VectorType;
@@ -46,7 +49,6 @@ int main(int, char * [] )
 
   typedef itk::ImageRegionIteratorWithIndex<FieldType> FieldIterator;
 
-  bool testPassed = true;
 
   // Random number generator
   vnl_random   rng;
@@ -510,6 +512,13 @@ int main(int, char * [] )
 //     std::cout << "Test failed" << std::endl;
 //     return EXIT_FAILURE;
 //     }
+}
+  catch( itk::ExceptionObject& err )
+    {
+    std::cout << err << std::endl;
+    testPassed = false;
+    }
+
 
   if( !testPassed )
     {

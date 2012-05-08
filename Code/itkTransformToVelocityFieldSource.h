@@ -164,11 +164,11 @@ protected:
 
   /** TransformToVelocityFieldSource can be implemented as a multithreaded
    * filter. */
-  void ThreadedGenerateData(const OutputImageRegionType & outputRegionForThread, int threadId );
+  void ThreadedGenerateData(const OutputImageRegionType & outputRegionForThread, ThreadIdType threadId );
 
   /** Faster implementation for resampling that works for with linear
    *  incremental transformation types. */
-  void LinearThreadedGenerateData(const OutputImageRegionType & outputRegionForThread, int threadId );
+  void LinearThreadedGenerateData(const OutputImageRegionType & outputRegionForThread, ThreadIdType threadId );
 
 private:
 
