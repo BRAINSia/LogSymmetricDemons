@@ -7,6 +7,11 @@
 namespace itk
 {
 
+#if ITK_VERSION_MAJOR < 4 && ! defined (ITKv3_THREAD_ID_TYPE_DEFINED)
+#define ITKv3_THREAD_ID_TYPE_DEFINED 1
+    typedef int ThreadIdType;
+#endif
+
 /** \class TransformToVelocityFieldSource
  * \brief Generate a velocity field from a input transform. The
  * exponential of the velocity and the input transform should represent the

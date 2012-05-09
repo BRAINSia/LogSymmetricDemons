@@ -7,6 +7,11 @@
 
 namespace itk
 {
+#if ITK_VERSION_MAJOR < 4 && ! defined (ITKv3_THREAD_ID_TYPE_DEFINED)
+#define ITKv3_THREAD_ID_TYPE_DEFINED 1
+    typedef int ThreadIdType;
+#endif
+
 /** \class VelocityFieldLieBracketFilter
  * \brief Compute the Lie bracket of two vector fields
  *  using the formula [v,u](p) = Jac(v)(p).u(p) − Jac(u)(p).v(p) (1)
