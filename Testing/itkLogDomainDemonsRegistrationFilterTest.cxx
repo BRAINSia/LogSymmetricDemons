@@ -209,7 +209,11 @@ int main(int, char * [] )
   InterpolatorType::Pointer interpolator = InterpolatorType::New();
 
   warper->SetInput( moving );
+#if (ITK_VERSION_MAJOR < 4)
   warper->SetDeformationField( registrator->GetDeformationField() );
+#else
+  warper->SetDisplacementField( registrator->GetDeformationField() );
+#endif
   warper->SetInterpolator( interpolator );
   warper->SetOutputSpacing( fixed->GetSpacing() );
   warper->SetOutputOrigin( fixed->GetOrigin() );

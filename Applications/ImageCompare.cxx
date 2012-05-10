@@ -7,8 +7,13 @@
 #include "itkImageFileWriter.h"
 #include "itkRescaleIntensityImageFilter.h"
 #include "itkExtractImageFilter.h"
+#if (ITK_VERSION_MAJOR < 4)
 #include "itkDifferenceImageFilter.h"
-
+#define TestingComparisonImageFilter DifferenceImageFilter
+#else
+#include "itkTestingComparisonImageFilter.h"
+#define TestingComparisonImageFilter Testing::ComparisonImageFilter
+#endif
 using namespace std;
 
 #define ITK_TEST_DIMENSION_MAX 6
@@ -136,7 +141,7 @@ int RegressionTestImage(const char *testImageFilename, const char *baselineImage
     }
 
   // Now compare the two images
-  typedef itk::DifferenceImageFilter<ImageType, ImageType> DiffType;
+  typedef itk::TestingComparisonImageFilter<ImageType, ImageType> DiffType;
   DiffType::Pointer diff = DiffType::New();
   diff->SetValidInput(baselineReader->GetOutput() );
   diff->SetTestInput(testReader->GetOutput() );

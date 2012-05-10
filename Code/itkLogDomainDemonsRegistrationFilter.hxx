@@ -72,7 +72,11 @@ LogDomainDemonsRegistrationFilter<TFixedImage, TMovingImage, TField>
   // update variables in the equation object
   DemonsRegistrationFunctionType *f = this->DownCastDifferenceFunctionType();
 
+#if (ITK_VERSION_MAJOR < 4)
   f->SetDeformationField( this->GetDeformationField() );
+#else
+  f->SetDisplacementField( this->GetDeformationField() );
+#endif
 
   // call the superclass  implementation ( initializes f )
   Superclass::InitializeIteration();

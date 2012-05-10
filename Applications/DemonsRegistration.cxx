@@ -1,4 +1,4 @@
-/**
+ /**
  * This is a small tool that shows how to use the diffeomorphic demons algorithm.
  * The user can choose if diffeomorphic, additive or compositive demons should be used.
  * The user can also choose the type of demons forces, or other parameters;
@@ -17,7 +17,12 @@
 #include <itkMinimumMaximumImageCalculator.h>
 #include <itkMultiResolutionPDEDeformableRegistration.h>
 #include <itkTransformFileReader.h>
+#if (ITK_VERSION_MAJOR < 4)
 #include <itkTransformToDeformationFieldSource.h>
+#define TransformToDeformationFieldSource TransformToDisplacementFieldSource
+#else
+#include <itkTransformToDisplacementFieldSource.h>
+#endif
 #include <itkVectorCentralDifferenceImageFunction.h>
 #include <itkVectorLinearInterpolateNearestNeighborExtrapolateImageFunction.h>
 #include <itkWarpHarmonicEnergyCalculator.h>
@@ -418,16 +423,26 @@ public:
       {
       iter = dfilter->GetElapsedIterations() - 1;
       metricbefore = dfilter->GetMetric();
+#if (ITK_VERSION_MAJOR < 4)
       deffield = const_cast<DiffeomorphicDemonsRegistrationFilterType *>(
           dfilter)->GetDeformationField();
+#else
+      deffield = const_cast<DiffeomorphicDemonsRegistrationFilterType *>(
+          dfilter)->GetDisplacementField();
+#endif
       }
     else if( const FastSymmetricForcesDemonsRegistrationFilterType * ffilter =
                dynamic_cast<const FastSymmetricForcesDemonsRegistrationFilterType *>( object ) )
       {
       iter = ffilter->GetElapsedIterations() - 1;
       metricbefore = ffilter->GetMetric();
+#if (ITK_VERSION_MAJOR < 4)
       deffield = const_cast<FastSymmetricForcesDemonsRegistrationFilterType *>(
           ffilter)->GetDeformationField();
+#else
+      deffield = const_cast<FastSymmetricForcesDemonsRegistrationFilterType *>(
+          ffilter)->GetDisplacementField();
+#endif
       }
     else if( const MultiResRegistrationFilterType * multiresfilter =
                dynamic_cast<const MultiResRegistrationFilterType *>( object ) )
@@ -730,7 +745,7 @@ void DemonsRegistrationFunction( arguments args )
         }
 
       // Set up the TransformToDeformationFieldFilter
-      typedef itk::TransformToDeformationFieldSource
+      typedef itk::TransformToDisplacementFieldSource
       <DeformationFieldType>                          FieldGeneratorType;
       typedef typename FieldGeneratorType::TransformType TransformType;
 
@@ -885,12 +900,20 @@ void DemonsRegistrationFunction( arguments args )
 
     if( args.sigmaDef > 0.1 )
       {
+#if (ITK_VERSION_MAJOR < 4)
       filter->SmoothDeformationFieldOn();
+#else
+      filter->SmoothDisplacementFieldOn();
+#endif
       filter->SetStandardDeviations( args.sigmaDef );
       }
     else
       {
+#if (ITK_VERSION_MAJOR < 4)
       filter->SmoothDeformationFieldOff();
+#else
+      filter->SmoothDisplacementFieldOff();
+#endif
       }
 
     if( args.sigmaUp > 0.1 )
@@ -964,6 +987,7 @@ void DemonsRegistrationFunction( arguments args )
 
     multires->SetFixedImage( fixedImage );
     multires->SetMovingImage( movingImage );
+#if ( ITK_VERSION_MAJOR < 4)
 #if ( ITK_VERSION_MAJOR > 3 ) || ( ITK_VERSION_MAJOR == 3 && ITK_VERSION_MINOR > 8 )
     multires->SetArbitraryInitialDeformationField( inputDefField );
 #else
@@ -974,7 +998,9 @@ void DemonsRegistrationFunction( arguments args )
       exit( EXIT_FAILURE );
       }
 #endif
-
+#else
+    multires->SetArbitraryInitialDisplacementField( inputDefField );
+#endif
     if( args.verbosity > 0 )
       {
       // Create the Command observer and register it with the registration filter.
@@ -1009,8 +1035,11 @@ void DemonsRegistrationFunction( arguments args )
   warper->SetOutputSpacing( fixedImage->GetSpacing() );
   warper->SetOutputOrigin( fixedImage->GetOrigin() );
   warper->SetOutputDirection( fixedImage->GetDirection() );
+#if (ITK_VERSION_MAJOR < 4)
   warper->SetDeformationField( defField );
-
+#else
+  warper->SetDisplacementField( defField );
+#endif
   // Write warped image out to file
   typedef PixelType                              OutputPixelType;
   typedef itk::Image<OutputPixelType, Dimension> OutputImageType;
@@ -1111,7 +1140,11 @@ void DemonsRegistrationFunction( arguments args )
     gridwarper->SetOutputSpacing( fixedImage->GetSpacing() );
     gridwarper->SetOutputOrigin( fixedImage->GetOrigin() );
     gridwarper->SetOutputDirection( fixedImage->GetDirection() );
+#if (ITK_VERSION_MAJOR < 4)
     gridwarper->SetDeformationField( defField );
+#else
+    gridwarper->SetDisplacementField( defField );
+#endif
 
     // Write warped grid to file
     typedef itk::ImageFileWriter<GridImageType> GridWriterType;

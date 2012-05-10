@@ -117,12 +117,20 @@ SymmetricLogDomainDemonsRegistrationFilter<TFixedImage, TMovingImage, TField>
   // update variables in the equation object
   DemonsRegistrationFunctionType *f = this->GetForwardRegistrationFunctionType();
 
+#if (ITK_VERSION_MAJOR < 4)
   f->SetDeformationField( this->GetDeformationField() );
+#else
+  f->SetDisplacementField( this->GetDeformationField() );
+#endif
 
   DemonsRegistrationFunctionType *b = this->GetBackwardRegistrationFunctionType();
   b->SetFixedImage( this->GetMovingImage() );
   b->SetMovingImage( this->GetFixedImage() );
+#if (ITK_VERSION_MAJOR < 4)
   b->SetDeformationField( this->GetInverseDeformationField() );
+#else
+  b->SetDisplacementField( this->GetInverseDeformationField() );
+#endif
   b->InitializeIteration();
 
   // call the superclass  implementation ( initializes f )

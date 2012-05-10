@@ -69,7 +69,11 @@ DisplacementFieldCompositionFilter<TInputImage, TOutputImage>
 
   // Set up mini-pipeline
   m_Warper->SetInput( leftField );
+#if (ITK_VERSION_MAJOR < 4)
   m_Warper->SetDeformationField( rightField );
+#else
+  m_Warper->SetDisplacementField( rightField );
+#endif
   m_Warper->SetOutputOrigin( rightField->GetOrigin() );
   m_Warper->SetOutputSpacing( rightField->GetSpacing() );
   m_Warper->SetOutputDirection( rightField->GetDirection() );
