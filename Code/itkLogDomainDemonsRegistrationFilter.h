@@ -134,6 +134,9 @@ protected:
   ~LogDomainDemonsRegistrationFilter()
   {
   }
+
+  virtual void VerifyInputInformation() {}
+
   void PrintSelf(std::ostream& os, Indent indent) const;
 
   /** Initialize the state of filter and equation before each iteration. */

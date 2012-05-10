@@ -55,7 +55,7 @@ LogDomainDeformableRegistrationFilter<TFixedImage, TMovingImage, TField>
 ::SetFixedImage(
   const FixedImageType * ptr )
 {
-  this->ProcessObject::SetNthInput( 1, const_cast<FixedImageType *>( ptr ) );
+  this->ProcessObject::SetNthInput( 0, const_cast<FixedImageType *>( ptr ) );
 }
 
 // Get the fixed image.
@@ -66,7 +66,7 @@ const typename LogDomainDeformableRegistrationFilter<TFixedImage, TMovingImage, 
 ::GetFixedImage() const
   {
   return dynamic_cast<const FixedImageType *>
-         ( this->ProcessObject::GetInput( 1 ) );
+         ( this->ProcessObject::GetInput( 0 ) );
   }
 
 // Set the moving image.
@@ -76,7 +76,7 @@ LogDomainDeformableRegistrationFilter<TFixedImage, TMovingImage, TField>
 ::SetMovingImage(
   const MovingImageType * ptr )
 {
-  this->ProcessObject::SetNthInput( 2, const_cast<MovingImageType *>( ptr ) );
+  this->ProcessObject::SetNthInput( 1, const_cast<MovingImageType *>( ptr ) );
 }
 
 // Get the moving image.
@@ -87,7 +87,7 @@ const typename LogDomainDeformableRegistrationFilter<TFixedImage, TMovingImage, 
 ::GetMovingImage() const
   {
   return dynamic_cast<const MovingImageType *>
-         ( this->ProcessObject::GetInput( 2 ) );
+         ( this->ProcessObject::GetInput( 1 ) );
   }
 
 template <class TFixedImage, class TMovingImage, class TField>
@@ -243,7 +243,7 @@ LogDomainDeformableRegistrationFilter<TFixedImage, TMovingImage, TField>
 ::CopyInputToOutput()
 {
 
-  typename Superclass::InputImageType::ConstPointer  inputPtr  = this->GetInput();
+  typename Superclass::InputImageType::ConstPointer  inputPtr  = this->GetInput(2);
 
   if( inputPtr )
     {
@@ -277,7 +277,7 @@ LogDomainDeformableRegistrationFilter<TFixedImage, TMovingImage, TField>
   // std::cout<<"LogDomainDeformableRegistrationFilter::GenerateOutputInformation"<<std::endl;
   typename DataObject::Pointer output;
 
-  if( this->GetInput(0) )
+  if( this->GetInput(2) )
     {
     // Initial velocity field is set.
     // Copy information from initial field.
@@ -322,7 +322,7 @@ LogDomainDeformableRegistrationFilter<TFixedImage, TMovingImage, TField>
   // just propagate up the output requested region for
   // the fixed image and initial velocity field.
   VelocityFieldPointer inputPtr =
-    const_cast<VelocityFieldType *>( this->GetInput() );
+    const_cast<VelocityFieldType *>( this->GetInput(2) );
   VelocityFieldPointer outputPtr = this->GetOutput();
   FixedImagePointer    fixedPtr =
     const_cast<FixedImageType *>( this->GetFixedImage() );

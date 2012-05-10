@@ -68,7 +68,7 @@ MultiResolutionLogDomainDeformableRegistration<TFixedImage, TMovingImage, TField
 ::SetMovingImage(
   const MovingImageType * ptr )
 {
-  this->ProcessObject::SetNthInput( 2, const_cast<MovingImageType *>( ptr ) );
+  this->ProcessObject::SetNthInput( 1, const_cast<MovingImageType *>( ptr ) );
 }
 
 // Get the moving image image.
@@ -79,7 +79,7 @@ const typename MultiResolutionLogDomainDeformableRegistration<TFixedImage, TMovi
 ::GetMovingImage(void) const
   {
   return dynamic_cast<const MovingImageType *>
-         ( this->ProcessObject::GetInput( 2 ) );
+         ( this->ProcessObject::GetInput( 1 ) );
   }
 
 // Set the fixed image.
@@ -89,7 +89,7 @@ MultiResolutionLogDomainDeformableRegistration<TFixedImage, TMovingImage, TField
 ::SetFixedImage(
   const FixedImageType * ptr )
 {
-  this->ProcessObject::SetNthInput( 1, const_cast<FixedImageType *>( ptr ) );
+  this->ProcessObject::SetNthInput( 0, const_cast<FixedImageType *>( ptr ) );
 }
 
 // Get the fixed image.
@@ -100,7 +100,7 @@ const typename MultiResolutionLogDomainDeformableRegistration<TFixedImage, TMovi
 ::GetFixedImage(void) const
   {
   return dynamic_cast<const FixedImageType *>
-         ( this->ProcessObject::GetInput( 1 ) );
+         ( this->ProcessObject::GetInput( 0 ) );
   }
 
 template <class TFixedImage, class TMovingImage, class TField, class TRealType>
@@ -219,7 +219,7 @@ MultiResolutionLogDomainDeformableRegistration<TFixedImage, TMovingImage, TField
     itkExceptionMacro( << "Registration filter not set" );
     }
 
-  if( this->m_InitialVelocityField && this->GetInput(0) )
+  if( this->m_InitialVelocityField && this->GetInput(2) )
     {
     itkExceptionMacro( << "Only one initial velocity can be given. "
                        << "SetInitialVelocityField should not be used in "
@@ -247,7 +247,7 @@ MultiResolutionLogDomainDeformableRegistration<TFixedImage, TMovingImage, TField
   VelocityFieldPointer tempField = NULL;
 
   VelocityFieldPointer inputPtr =
-    const_cast<VelocityFieldType *>( this->GetInput(0) );
+    const_cast<VelocityFieldType *>( this->GetInput(2) );
 
   if( this->m_InitialVelocityField )
     {
@@ -462,7 +462,7 @@ MultiResolutionLogDomainDeformableRegistration<TFixedImage, TMovingImage, TField
 
   typename DataObject::Pointer output;
 
-  if( this->GetInput(0) )
+  if( this->GetInput(2) )
     {
     // Initial velocity field is set.
     // Copy information from initial field.
@@ -507,7 +507,7 @@ MultiResolutionLogDomainDeformableRegistration<TFixedImage, TMovingImage, TField
   // just propagate up the output requested region for
   // the fixed image and initial velocity field.
   VelocityFieldPointer inputPtr =
-    const_cast<VelocityFieldType *>( this->GetInput() );
+    const_cast<VelocityFieldType *>( this->GetInput(2) );
   VelocityFieldPointer outputPtr = this->GetOutput();
   FixedImagePointer    fixedPtr =
     const_cast<FixedImageType *>( this->GetFixedImage() );
