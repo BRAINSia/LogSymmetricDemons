@@ -1223,42 +1223,44 @@ void DemonsRegistrationFunction( arguments args )
 
 int main( int argc, char *argv[] )
 {
-  struct arguments args;
-
-  parseOpts(argc, argv, args);
-
-  std::cout << "Starting demons registration with the following arguments:" << std::endl;
-  std::cout << args << std::endl << std::endl;
-
-  // FIXME uncomment for debug only
-  // itk::MultiThreader::SetGlobalDefaultNumberOfThreads(1);
-
-  // Get the image dimension
-  itk::ImageIOBase::Pointer imageIO;
   try
     {
-    imageIO = itk::ImageIOFactory::CreateImageIO(
-        args.fixedImageFile.c_str(), itk::ImageIOFactory::ReadMode);
-    if( imageIO )
+    struct arguments args;
+
+    parseOpts(argc, argv, args);
+
+    std::cout << "Starting demons registration with the following arguments:" << std::endl;
+    std::cout << args << std::endl << std::endl;
+
+    // FIXME uncomment for debug only
+    // itk::MultiThreader::SetGlobalDefaultNumberOfThreads(1);
+
+    // Get the image dimension
+    itk::ImageIOBase::Pointer imageIO;
+    try
       {
-      imageIO->SetFileName(args.fixedImageFile.c_str() );
-      imageIO->ReadImageInformation();
+      imageIO = itk::ImageIOFactory::CreateImageIO(
+        args.fixedImageFile.c_str(), itk::ImageIOFactory::ReadMode);
+      if( imageIO )
+        {
+        imageIO->SetFileName(args.fixedImageFile.c_str() );
+        imageIO->ReadImageInformation();
+        }
+      else
+        {
+        std::cout << "Could not read the fixed image information." << std::endl;
+        exit( EXIT_FAILURE );
+        }
       }
-    else
+    catch( itk::ExceptionObject& err )
       {
       std::cout << "Could not read the fixed image information." << std::endl;
+      std::cout << err << std::endl;
       exit( EXIT_FAILURE );
       }
-    }
-  catch( itk::ExceptionObject& err )
-    {
-    std::cout << "Could not read the fixed image information." << std::endl;
-    std::cout << err << std::endl;
-    exit( EXIT_FAILURE );
-    }
 
-  switch( imageIO->GetNumberOfDimensions() )
-    {
+    switch( imageIO->GetNumberOfDimensions() )
+      {
     case 2:
       DemonsRegistrationFunction<2>(args);
       break;
@@ -1268,6 +1270,13 @@ int main( int argc, char *argv[] )
     default:
       std::cout << "Unsuported dimension" << std::endl;
       exit( EXIT_FAILURE );
+      }
+    }
+  catch( itk::ExceptionObject& err )
+    {
+    std::cout << "Failed run with exception caught." << std::endl;
+    std::cout << err << std::endl;
+    exit( EXIT_FAILURE );
     }
 
   return EXIT_SUCCESS;

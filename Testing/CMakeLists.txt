@@ -58,6 +58,7 @@ add_test(CompareImageSLD ${PROJECT_BINARY_DIR}/bin/ImageCompare
 
 
 # Add a test to check the style of the source code
+if ( 0 )
 find_program(KWSTYLE_EXECUTABLE
   NAMES KWStyle
   PATHS
@@ -73,3 +74,4 @@ if(KWSTYLE_EXECUTABLE)
 else(KWSTYLE_EXECUTABLE)
   message("Did not find KWStyle - the style test will not be run")
 endif(KWSTYLE_EXECUTABLE)
+endif()
