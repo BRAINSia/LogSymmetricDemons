@@ -19,7 +19,6 @@
 #include <itkTransformFileReader.h>
 #if (ITK_VERSION_MAJOR < 4)
 #include <itkTransformToDeformationFieldSource.h>
-#define TransformToDeformationFieldSource TransformToDisplacementFieldSource
 #else
 #include <itkTransformToDisplacementFieldSource.h>
 #endif
@@ -745,8 +744,11 @@ void DemonsRegistrationFunction( arguments args )
         }
 
       // Set up the TransformToDeformationFieldFilter
-      typedef itk::TransformToDisplacementFieldSource
-      <DeformationFieldType>                          FieldGeneratorType;
+#if (ITK_VERSION_MAJOR < 4)
+      typedef itk::TransformToDeformationFieldSource<DeformationFieldType>  FieldGeneratorType;
+#else
+      typedef itk::TransformToDisplacementFieldSource<DeformationFieldType>  FieldGeneratorType;
+#endif
       typedef typename FieldGeneratorType::TransformType TransformType;
 
       TransformType* trsf = dynamic_cast<TransformType *>(baseTrsf);
