@@ -1,4 +1,4 @@
- /**
+/**
  * This is a small tool that shows how to use the diffeomorphic demons algorithm.
  * The user can choose if diffeomorphic, additive or compositive demons should be used.
  * The user can also choose the type of demons forces, or other parameters;

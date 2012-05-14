@@ -13,6 +13,7 @@
 #include "itkStreamingImageFilter.h"
 #include "vnl/vnl_math.h"
 #include "itkCommand.h"
+#include "itkMultiThreader.h"
 
 // The following three classes are used to support callbacks
 // on the filter in the pipeline that follows later
@@ -32,6 +33,7 @@ public:
 
 int main(int, char * [] )
 {
+  itk::MultiThreader::SetGlobalMaximumNumberOfThreads(1);
   const unsigned int ImageDimension = 2;
 
   typedef itk::Vector<float, ImageDimension>     VectorType;

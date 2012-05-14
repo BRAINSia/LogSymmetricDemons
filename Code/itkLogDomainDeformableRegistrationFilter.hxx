@@ -55,7 +55,11 @@ LogDomainDeformableRegistrationFilter<TFixedImage, TMovingImage, TField>
 ::SetFixedImage(
   const FixedImageType * ptr )
 {
+#if (ITK_VERSION_MAJOR < 4)
+  this->ProcessObject::SetNthInput( 1, const_cast<FixedImageType *>( ptr ) );
+#else
   this->ProcessObject::SetNthInput( 0, const_cast<FixedImageType *>( ptr ) );
+#endif
 }
 
 // Get the fixed image.
@@ -66,7 +70,11 @@ const typename LogDomainDeformableRegistrationFilter<TFixedImage, TMovingImage, 
 ::GetFixedImage() const
   {
   return dynamic_cast<const FixedImageType *>
+#if (ITK_VERSION_MAJOR < 4)
+         ( this->ProcessObject::GetInput( 1 ) );
+#else
          ( this->ProcessObject::GetInput( 0 ) );
+#endif
   }
 
 // Set the moving image.
@@ -76,7 +84,11 @@ LogDomainDeformableRegistrationFilter<TFixedImage, TMovingImage, TField>
 ::SetMovingImage(
   const MovingImageType * ptr )
 {
+#if (ITK_VERSION_MAJOR < 4)
+  this->ProcessObject::SetNthInput( 2, const_cast<MovingImageType *>( ptr ) );
+#else
   this->ProcessObject::SetNthInput( 1, const_cast<MovingImageType *>( ptr ) );
+#endif
 }
 
 // Get the moving image.
@@ -87,7 +99,11 @@ const typename LogDomainDeformableRegistrationFilter<TFixedImage, TMovingImage, 
 ::GetMovingImage() const
   {
   return dynamic_cast<const MovingImageType *>
+#if (ITK_VERSION_MAJOR < 4)
+         ( this->ProcessObject::GetInput( 2 ) );
+#else
          ( this->ProcessObject::GetInput( 1 ) );
+#endif
   }
 
 template <class TFixedImage, class TMovingImage, class TField>
@@ -243,7 +259,11 @@ LogDomainDeformableRegistrationFilter<TFixedImage, TMovingImage, TField>
 ::CopyInputToOutput()
 {
 
+#if (ITK_VERSION_MAJOR < 4)
+  typename Superclass::InputImageType::ConstPointer  inputPtr  = this->GetInput();
+#else
   typename Superclass::InputImageType::ConstPointer  inputPtr  = this->GetInput(2);
+#endif
 
   if( inputPtr )
     {
@@ -277,7 +297,11 @@ LogDomainDeformableRegistrationFilter<TFixedImage, TMovingImage, TField>
   // std::cout<<"LogDomainDeformableRegistrationFilter::GenerateOutputInformation"<<std::endl;
   typename DataObject::Pointer output;
 
+#if (ITK_VERSION_MAJOR < 4)
+  if( this->GetInput(0) )
+#else
   if( this->GetInput(2) )
+#endif
     {
     // Initial velocity field is set.
     // Copy information from initial field.
@@ -321,8 +345,13 @@ LogDomainDeformableRegistrationFilter<TFixedImage, TMovingImage, TField>
 
   // just propagate up the output requested region for
   // the fixed image and initial velocity field.
+#if (ITK_VERSION_MAJOR < 4)
+  VelocityFieldPointer inputPtr =
+    const_cast<VelocityFieldType *>( this->GetInput() );
+#else
   VelocityFieldPointer inputPtr =
     const_cast<VelocityFieldType *>( this->GetInput(2) );
+#endif
   VelocityFieldPointer outputPtr = this->GetOutput();
   FixedImagePointer    fixedPtr =
     const_cast<FixedImageType *>( this->GetFixedImage() );

@@ -161,8 +161,11 @@ public:
    *  images characteristics at the coarsest level of the pyramid. */
   virtual void SetArbitraryInitialVelocityField( VelocityFieldType * ptr )
   {
-    // this->SetInput( ptr );
+#if (ITK_VERSION_MAJOR < 4)
+    this->SetInput( ptr );
+#else
     this->SetNthInput(2, ptr);
+#endif
   }
 
   /** Get output velocity field. */
