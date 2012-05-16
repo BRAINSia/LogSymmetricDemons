@@ -176,6 +176,9 @@ int RegressionTestImage(const char *testImageFilename, const char *baselineImage
     region.SetSize(size);
 
     ExtractType::Pointer extract = ExtractType::New();
+#if (ITK_VERSION_MAJOR > 3)
+    extract->SetDirectionCollapseToIdentity();
+#endif
     extract->SetInput(rescale->GetOutput() );
     extract->SetExtractionRegion(region);
 
