@@ -130,8 +130,11 @@ public:
   /** Set initial velocity field. */
   void SetInitialVelocityField( VelocityFieldType * ptr )
   {
-    // this->SetInput( ptr );
+#if (ITK_VERSION_MAJOR < 4)
+    this->SetInput( ptr );
+#else
     this->SetNthInput( 2, ptr );
+#endif
   }
 
   /** Get output velocity field. */

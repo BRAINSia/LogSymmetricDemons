@@ -9,6 +9,34 @@
 #include "itkVectorCastImageFilter.h"
 #include "itkNearestNeighborInterpolateImageFunction.h"
 #include "itkWarpImageFilter.h"
+#include "itkImageFileWriter.h"
+
+/*
+ * This is the prefered ABI for Writing images.
+ * We know that the image is not going to change
+ * so make sure that the API indicates that.
+ */
+template <class ImageType>
+void
+WriteConstImage(const typename ImageType::ConstPointer image,
+                const std::string & filename)
+{
+  typedef itk::ImageFileWriter<ImageType> WriterType;
+  typename  WriterType::Pointer writer = WriterType::New();
+  writer->UseCompressionOn();
+  writer->SetFileName( filename.c_str() );
+  writer->SetInput(image);
+  try
+    {
+    writer->Update();
+    }
+  catch( itk::ExceptionObject & err )
+    {
+    std::cout << "Exception Object caught: " << std::endl;
+    std::cout << err << std::endl;
+    throw;
+    }
+}
 
 namespace
 {
@@ -79,7 +107,7 @@ FillWithCircle(TImage * image,
 int main(int, char * [] )
 {
   const unsigned int ImageDimension = 2;
-
+  itk::MultiThreader::SetGlobalMaximumNumberOfThreads(1);
   typedef itk::Vector<float, ImageDimension>     VectorType;
   typedef itk::Image<VectorType, ImageDimension> FieldType;
   typedef itk::Image<float, ImageDimension>      ImageType;
@@ -232,6 +260,11 @@ int main(int, char * [] )
                                                  fixed->GetBufferedRegion() );
   itk::ImageRegionIterator<ImageType> warpedIter( warper->GetOutput(),
                                                   fixed->GetBufferedRegion() );
+
+  ImageType::Pointer warped = warper->GetOutput();
+
+  WriteConstImage<ImageType>(fixed.GetPointer(),"Fixed.nii.gz");
+  WriteConstImage<ImageType>(warped.GetPointer(),"WarpedMoving.nii.gz");
 
   unsigned int numPixelsDifferent = 0;
   while( !fixedIter.IsAtEnd() )
