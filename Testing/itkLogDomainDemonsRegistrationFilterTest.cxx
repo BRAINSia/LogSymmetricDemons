@@ -134,7 +134,8 @@ int main(int, char * [] )
 
     ImageType::DirectionType fixed_direction;
     fixed_direction.SetIdentity();
-    fixed_direction(1, 1) = -1;
+    //HACK 
+    //fixed_direction(1, 1) = -1;
 
     ImageType::Pointer fixed = ImageType::New();
     fixed->SetRegions( fixed_region );
