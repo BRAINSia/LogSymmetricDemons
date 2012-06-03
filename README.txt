@@ -2,7 +2,7 @@ A few notes without special order.
 
 This project is meant to be compiled with cmake.
 
-Unless you know what you are doing, it is recommended to use ITK version 3.18 or greater with the following compilation options:
+Unless you know what you are doing, it is recommended to use ITK version 3.20.1 or greater with the following compilation options:
   - ITK_USE_REVIEW = ON
   - BUILD_SHARED_LIBS = ON
   - CMAKE_BUILD_TYPE = Release

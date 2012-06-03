@@ -124,9 +124,7 @@ int main(int, char * [] )
 
   ImageType::DirectionType fixed_direction;
   fixed_direction.SetIdentity();
-#if ( defined(ITK_USE_ORIENTED_IMAGE_DIRECTION) && defined(ITK_IMAGE_BEHAVES_AS_ORIENTED_IMAGE) )
   // fixed_direction(1,1)=-1;
-#endif
 
   ImageType::SpacingType fixed_spacing;
   fixed_spacing.Fill( 0.9 );

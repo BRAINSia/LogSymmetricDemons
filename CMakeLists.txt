@@ -57,20 +57,32 @@ foreach(Package ${Optional_Packages})
   LOAD_OPTIONAL_PACKAGE(${Package})
 endforeach(Package)
 
-
 #-----------------------------------------------------------------------------
 #Some packages options are required for this project. Check them now
 set(_ITKVersionString "${ITK_VERSION_MAJOR}.${ITK_VERSION_MINOR}.${ITK_VERSION_PATCH}" )
 math(EXPR _ITKVersionNum "${ITK_VERSION_MAJOR}*100*100 + ${ITK_VERSION_MINOR}*100 + ${ITK_VERSION_PATCH}")
 if( _ITKVersionNum LESS 30800 )
-  message(SEND_ERROR "The ITK version you want to use (${_ITKVersionString}) is not supported by this project. Please use a more recent version of ITK. The minimum required version is 3.8.0. The recommended version is 3.14.0.")
+  message(SEND_ERROR "The ITK version you want to use (${_ITKVersionString}) is not supported by this project. Please use a more recent version of ITK. The minimum required version is 3.8.0. The recommended version is 3.20.1.")
 endif( _ITKVersionNum LESS 30800 )
 
-
+# If using ITKv3, then a certain revision number MUST be set to "ON".
+# These are the default settings in ITKv4.
 if(ITK_VERSION_MAJOR LESS 4)
-  if(NOT ITK_USE_REVIEW)
-    message(SEND_ERROR "ITK_USE_REVIEW has not been set to on when compiling ITK. This option is mandatory for this project to build. Please recompile your ITK installation.")
-  endif(NOT ITK_USE_REVIEW)
+   set(ITKv3_REQUIRED_FLAGS
+             ITK_USE_REVIEW
+             ITK_USE_REVIEW_STATISTICS
+             ITK_USE_OPTIMIZED_REGISTRATION_METHODS
+             ITK_USE_CENTERED_PIXEL_COORDINATES_CONSISTENTLY
+             ITK_USE_ORIENTED_IMAGE_DIRECTION
+            )
+           #ITK_USE_PORTABLE_ROUND
+           #ITK_IMAGE_BEHAVES_AS_ORIENTED_IMAGE
+   foreach( ITKv3_REQUIRED_FL ${ITKv3_REQUIRED_FLAGS} )
+     if(NOT ${ITKv3_REQUIRED_FL})
+        message(SEND_ERROR
+          "${ITKv3_REQUIRED_FL} has not been set to on when compiling ITKv3\n in ${ITK_DIR}. This option is mandatory for this project to build. Please recompile your ITK installation.")
+       endif(NOT ${ITKv3_REQUIRED_FL})
+   endforeach( ITKv3_REQUIRED_FL ${ITKv3_REQUIRED_FLAGS} )
 endif()
 
 #-----------------------------------------------------------------------------
