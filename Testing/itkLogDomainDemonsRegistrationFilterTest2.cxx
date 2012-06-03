@@ -102,7 +102,6 @@ FillWithCircle(TImage * image,
     }
 }
 
-
 // ----------------------------------------------
 
 int main(int, char * [] )
@@ -110,7 +109,8 @@ int main(int, char * [] )
   try
     {
     const unsigned int ImageDimension = 3;
-
+    //HACK!
+    itk::MultiThreader::SetGlobalMaximumNumberOfThreads(1);
     typedef itk::Vector<float, ImageDimension>     VectorType;
     typedef itk::Image<VectorType, ImageDimension> FieldType;
     typedef itk::Image<float, ImageDimension>      ImageType;
@@ -265,9 +265,6 @@ int main(int, char * [] )
 
     warper->Update();
 
-    ImageType::Pointer warpedOutput = warper->GetOutput();
-    WriteConstImage<ImageType>( warpedOutput.GetPointer(), "warped-moving.mha");
-
     // ---------------------------------------------------------
 
     std::cout << "Compare warped moving and fixed." << std::endl;
@@ -276,6 +273,10 @@ int main(int, char * [] )
       fixed->GetBufferedRegion() );
     itk::ImageRegionIterator<ImageType> warpedIter( warper->GetOutput(),
       fixed->GetBufferedRegion() );
+
+    ImageType::Pointer warpedOutput = warper->GetOutput();
+
+    WriteConstImage<ImageType>( warpedOutput.GetPointer(), "warped-moving.mha");
 
     unsigned int numPixelsDifferent = 0;
     while( !fixedIter.IsAtEnd() )

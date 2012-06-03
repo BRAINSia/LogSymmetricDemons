@@ -106,256 +106,261 @@ FillWithCircle(TImage * image,
 
 int main(int, char * [] )
 {
-  const unsigned int ImageDimension = 2;
-  itk::MultiThreader::SetGlobalMaximumNumberOfThreads(1);
-  typedef itk::Vector<float, ImageDimension>     VectorType;
-  typedef itk::Image<VectorType, ImageDimension> FieldType;
-  typedef itk::Image<float, ImageDimension>      ImageType;
-
-  typedef FieldType::PixelType PixelType;
-  typedef FieldType::IndexType IndexType;
-
-  bool testPassed = true;
-
-  // --------------------------------------------------------
-  std::cout << "Generate input images and initial deformation field";
-  std::cout << std::endl;
-
-  ImageType::RegionType region;
-  ImageType::SizeType   size = {{128, 128}};
-  ImageType::IndexType  index;
-  index.Fill( 0 );
-  region.SetSize( size );
-  region.SetIndex( index );
-
-  ImageType::DirectionType direction;
-  direction.SetIdentity();
-  direction(1, 1) = -1;
-
-  ImageType::Pointer moving = ImageType::New();
-  ImageType::Pointer fixed = ImageType::New();
-  FieldType::Pointer initField = FieldType::New();
-
-  moving->SetRegions( region );
-  moving->Allocate();
-  moving->SetDirection( direction );
-
-  fixed->SetRegions( region );
-  fixed->Allocate();
-  fixed->SetDirection( direction );
-
-  initField->SetRegions( region );
-  initField->Allocate();
-  initField->SetDirection( direction );
-
-  double               center[ImageDimension];
-  double               radius = 30.0;
-  ImageType::PixelType fgnd = 250.0;
-  ImageType::PixelType bgnd = 15.0;
-
-  // Fill the moving image with a circle
-  center[0] = 64; center[1] = 64;
-  FillWithCircle<ImageType>( moving, center, radius, fgnd, bgnd );
-
-  // Fill the fixed image with a circle
-  center[0] = 62; center[1] = 64;
-  FillWithCircle<ImageType>( fixed, center, radius, fgnd, bgnd );
-
-  // Fill initial velocity field with null vectors
-  VectorType zeroVec;
-  zeroVec.Fill( 0.0 );
-  initField->FillBuffer( zeroVec );
-
-  typedef itk::VectorCastImageFilter<FieldType, FieldType> CasterType;
-  CasterType::Pointer caster = CasterType::New();
-  caster->SetInput( initField );
-  caster->InPlaceOff();
-
-  // -------------------------------------------------------------
-
-  std::cout << "Run registration and warp moving" << std::endl;
-
-  typedef itk::LogDomainDemonsRegistrationFilter<ImageType, ImageType, FieldType> RegistrationType;
-  RegistrationType::Pointer registrator = RegistrationType::New();
-
-  registrator->SetInitialVelocityField( caster->GetOutput() );
-  registrator->SetMovingImage( moving );
-  registrator->SetFixedImage( fixed );
-  registrator->SetNumberOfIterations( 200 );
-  registrator->SetStandardDeviations( 0.7 );
-  registrator->SetMaximumUpdateStepLength( 2.0 );
-  registrator->SetMaximumError( 0.08 );
-  registrator->SetMaximumKernelWidth( 10 );
-  registrator->SetIntensityDifferenceThreshold( 0.001 );
-  registrator->SetNumberOfBCHApproximationTerms( 2 );
-
-  // Turn on inplace execution
-  registrator->InPlaceOn();
-
-  typedef RegistrationType::DemonsRegistrationFunctionType FunctionType;
-  FunctionType * fptr;
-  fptr = dynamic_cast<FunctionType *>( registrator->GetDifferenceFunction().GetPointer() );
-  fptr->Print( std::cout );
-
-  // Exercise other member variables
-  std::cout << "Max. error for Gaussian operator approximation: "
-            << registrator->GetMaximumError()
-            << std::endl;
-  std::cout << "Max. Gaussian kernel width: "
-            << registrator->GetMaximumKernelWidth()
-            << std::endl;
-
-  // Set standards deviations
-  double v[ImageDimension];
-  for( unsigned int j = 0; j < ImageDimension; j++ )
-    {
-    v[j] = registrator->GetStandardDeviations()[j];
-    }
-  registrator->SetStandardDeviations( v );
-
-  // Progress tracking
-  typedef ShowProgressObject<RegistrationType> ProgressType;
-  ProgressType                                    progressWatch(registrator);
-  itk::SimpleMemberCommand<ProgressType>::Pointer command;
-  command = itk::SimpleMemberCommand<ProgressType>::New();
-  command->SetCallbackFunction(&progressWatch,
-                               &ProgressType::ShowProgress);
-  registrator->AddObserver( itk::ProgressEvent(), command);
-
-  registrator->Update();
-
-  // Warper for the moving image
-  typedef itk::WarpImageFilter<ImageType, ImageType, FieldType> WarperType;
-  WarperType::Pointer warper = WarperType::New();
-
-  // Interpolator
-  typedef WarperType::CoordRepType CoordRepType;
-  typedef itk::NearestNeighborInterpolateImageFunction<ImageType, CoordRepType>
-  InterpolatorType;
-  InterpolatorType::Pointer interpolator = InterpolatorType::New();
-
-  warper->SetInput( moving );
-#if (ITK_VERSION_MAJOR < 4)
-  warper->SetDeformationField( registrator->GetDeformationField() );
-#else
-  warper->SetDisplacementField( registrator->GetDeformationField() );
-#endif
-  warper->SetInterpolator( interpolator );
-  warper->SetOutputSpacing( fixed->GetSpacing() );
-  warper->SetOutputOrigin( fixed->GetOrigin() );
-  warper->SetOutputDirection( fixed->GetDirection() );
-  warper->SetEdgePaddingValue( bgnd );
-
-  warper->Print( std::cout );
-
-  warper->Update();
-
-  // ---------------------------------------------------------
-
-  std::cout << "Compare warped moving and fixed." << std::endl;
-
-  itk::ImageRegionIterator<ImageType> fixedIter( fixed,
-                                                 fixed->GetBufferedRegion() );
-  itk::ImageRegionIterator<ImageType> warpedIter( warper->GetOutput(),
-                                                  fixed->GetBufferedRegion() );
-
-  ImageType::Pointer warped = warper->GetOutput();
-
-  WriteConstImage<ImageType>(fixed.GetPointer(),"Fixed.nii.gz");
-  WriteConstImage<ImageType>(warped.GetPointer(),"WarpedMoving.nii.gz");
-
-  unsigned int numPixelsDifferent = 0;
-  while( !fixedIter.IsAtEnd() )
-    {
-    if( fixedIter.Get() != warpedIter.Get() )
-      {
-      numPixelsDifferent++;
-      }
-    ++fixedIter;
-    ++warpedIter;
-    }
-
-  std::cout << "Number of pixels that differ: " << numPixelsDifferent;
-  std::cout << std::endl;
-
-  if( numPixelsDifferent > 10 )
-    {
-    std::cout << "Test failed - too many pixels differ." << std::endl;
-    return EXIT_FAILURE;
-    }
-
-  registrator->Print( std::cout );
-
-  // -----------------------------------------------------------
-
-  std::cout << "Test running registrator without initial deformation field.";
-  std::cout << std::endl;
-
   try
     {
-    registrator->SetInput( NULL );
-    registrator->SetNumberOfIterations( 2 );
+    const unsigned int ImageDimension = 2;
+    //HACK!
+    itk::MultiThreader::SetGlobalMaximumNumberOfThreads(1);
+    typedef itk::Vector<float, ImageDimension>     VectorType;
+    typedef itk::Image<VectorType, ImageDimension> FieldType;
+    typedef itk::Image<float, ImageDimension>      ImageType;
+
+    typedef FieldType::PixelType PixelType;
+    typedef FieldType::IndexType IndexType;
+
+    bool testPassed = true;
+
+    // --------------------------------------------------------
+    std::cout << "Generate input images and initial deformation field";
+    std::cout << std::endl;
+
+    // Declare fixed image
+    ImageType::RegionType fixed_region;
+    ImageType::SizeType   fixed_size = {{128, 128}};
+    ImageType::IndexType  fixed_index;
+    fixed_index.Fill( 0 );
+    fixed_region.SetSize( fixed_size );
+    fixed_region.SetIndex( fixed_index );
+
+    ImageType::DirectionType fixed_direction;
+    fixed_direction.SetIdentity();
+    fixed_direction(1, 1) = -1;
+
+    ImageType::Pointer fixed = ImageType::New();
+    fixed->SetRegions( fixed_region );
+    fixed->Allocate();
+    fixed->SetDirection( fixed_direction );
+
+    ImageType::Pointer moving = ImageType::New();
+    moving->SetRegions( fixed_region );
+    moving->Allocate();
+    moving->SetDirection( fixed_direction );
+
+    FieldType::Pointer initField = FieldType::New();
+    initField->SetRegions( fixed_region );
+    initField->Allocate();
+    initField->SetDirection( fixed_direction );
+
+    double               center[ImageDimension];
+    double               radius = 30.0;
+    ImageType::PixelType fgnd = 250.0;
+    ImageType::PixelType bgnd = 15.0;
+
+    // Fill the moving image with a circle
+    center[0] = 64; center[1] = 64;
+    FillWithCircle<ImageType>( moving, center, radius, fgnd, bgnd );
+
+    // Fill the fixed image with a circle
+    center[0] = 62; center[1] = 64;
+    FillWithCircle<ImageType>( fixed, center, radius, fgnd, bgnd );
+
+    // Fill initial velocity field with null vectors
+    VectorType zeroVec;
+    zeroVec.Fill( 0.0 );
+    initField->FillBuffer( zeroVec );
+
+    typedef itk::VectorCastImageFilter<FieldType, FieldType> CasterType;
+    CasterType::Pointer caster = CasterType::New();
+    caster->SetInput( initField );
+    caster->InPlaceOff();
+
+    // -------------------------------------------------------------
+
+    std::cout << "Run registration and warp moving" << std::endl;
+
+    typedef itk::LogDomainDemonsRegistrationFilter<ImageType, ImageType, FieldType> RegistrationType;
+    RegistrationType::Pointer registrator = RegistrationType::New();
+
+    registrator->SetInitialVelocityField( caster->GetOutput() );
+    registrator->SetMovingImage( moving );
+    registrator->SetFixedImage( fixed );
+    registrator->SetNumberOfIterations( 200 );
+    registrator->SetStandardDeviations( 0.7 );
+    registrator->SetMaximumUpdateStepLength( 2.0 );
+    registrator->SetMaximumError( 0.08 );
+    registrator->SetMaximumKernelWidth( 10 );
+    registrator->SetIntensityDifferenceThreshold( 0.001 );
+    registrator->SetNumberOfBCHApproximationTerms( 2 );
+
+    // Turn on inplace execution
+    registrator->InPlaceOn();
+
+    typedef RegistrationType::DemonsRegistrationFunctionType FunctionType;
+    FunctionType * fptr;
+    fptr = dynamic_cast<FunctionType *>( registrator->GetDifferenceFunction().GetPointer() );
+    fptr->Print( std::cout );
+
+    // Exercise other member variables
+    std::cout << "Max. error for Gaussian operator approximation: "
+      << registrator->GetMaximumError()
+      << std::endl;
+    std::cout << "Max. Gaussian kernel width: "
+      << registrator->GetMaximumKernelWidth()
+      << std::endl;
+
+    // Set standards deviations
+    double v[ImageDimension];
+    for( unsigned int j = 0; j < ImageDimension; j++ )
+      {
+      v[j] = registrator->GetStandardDeviations()[j];
+      }
+    registrator->SetStandardDeviations( v );
+
+    // Progress tracking
+    typedef ShowProgressObject<RegistrationType> ProgressType;
+    ProgressType                                    progressWatch(registrator);
+    itk::SimpleMemberCommand<ProgressType>::Pointer command;
+    command = itk::SimpleMemberCommand<ProgressType>::New();
+    command->SetCallbackFunction(&progressWatch,
+      &ProgressType::ShowProgress);
+    registrator->AddObserver( itk::ProgressEvent(), command);
+
     registrator->Update();
+
+    // Warper for the moving image
+    typedef itk::WarpImageFilter<ImageType, ImageType, FieldType> WarperType;
+    WarperType::Pointer warper = WarperType::New();
+
+    // Interpolator
+    typedef WarperType::CoordRepType CoordRepType;
+    typedef itk::NearestNeighborInterpolateImageFunction<ImageType, CoordRepType>
+      InterpolatorType;
+    InterpolatorType::Pointer interpolator = InterpolatorType::New();
+
+    warper->SetInput( moving );
+#if (ITK_VERSION_MAJOR < 4)
+    warper->SetDeformationField( registrator->GetDeformationField() );
+#else
+    warper->SetDisplacementField( registrator->GetDeformationField() );
+#endif
+    warper->SetInterpolator( interpolator );
+    warper->SetOutputSpacing( fixed->GetSpacing() );
+    warper->SetOutputOrigin( fixed->GetOrigin() );
+    warper->SetOutputDirection( fixed->GetDirection() );
+    warper->SetEdgePaddingValue( bgnd );
+
+    warper->Print( std::cout );
+
+    warper->Update();
+
+    // ---------------------------------------------------------
+
+    std::cout << "Compare warped moving and fixed." << std::endl;
+
+    itk::ImageRegionIterator<ImageType> fixedIter( fixed,
+      fixed->GetBufferedRegion() );
+    itk::ImageRegionIterator<ImageType> warpedIter( warper->GetOutput(),
+      fixed->GetBufferedRegion() );
+
+    ImageType::Pointer warpedOutput = warper->GetOutput();
+
+    WriteConstImage<ImageType>(fixed.GetPointer(),"Fixed.nii.gz");
+    WriteConstImage<ImageType>( warpedOutput.GetPointer(),"WarpedMoving.nii.gz");
+
+    unsigned int numPixelsDifferent = 0;
+    while( !fixedIter.IsAtEnd() )
+      {
+      if( fixedIter.Get() != warpedIter.Get() )
+        {
+        numPixelsDifferent++;
+        }
+      ++fixedIter;
+      ++warpedIter;
+      }
+
+    std::cout << "Number of pixels that differ: " << numPixelsDifferent;
+    std::cout << std::endl;
+
+    if( numPixelsDifferent > 10 )
+      {
+      std::cout << "Test failed - too many pixels differ." << std::endl;
+      testPassed = false;
+      }
+
+    registrator->Print( std::cout );
+
+    // -----------------------------------------------------------
+
+    std::cout << "Test running registrator without initial deformation field.";
+    std::cout << std::endl;
+
+    try
+      {
+      registrator->SetInput( NULL );
+      registrator->SetNumberOfIterations( 2 );
+      registrator->Update();
+      }
+    catch( itk::ExceptionObject& err )
+      {
+      std::cout << "Unexpected error." << std::endl;
+      std::cout << err << std::endl;
+      testPassed = false;
+      }
+
+    if( !testPassed )
+      {
+      std::cout << "Test failed" << std::endl;
+      return EXIT_FAILURE;
+      }
+
+    // --------------------------------------------------------------
+    std::cout << "Test exception handling." << std::endl;
+    std::cout << "Test NULL moving image. " << std::endl;
+    try
+      {
+      registrator->SetInput( caster->GetOutput() );
+      registrator->SetMovingImage( NULL );
+      registrator->Update();
+      }
+    catch( itk::ExceptionObject & err )
+      {
+      std::cout << "Caught expected error." << std::endl;
+      std::cout << err << std::endl;
+      }
+    if( !testPassed )
+      {
+      std::cout << "Test failed" << std::endl;
+      return EXIT_FAILURE;
+      }
+
+    registrator->SetMovingImage( moving );
+    registrator->ResetPipeline();
+    std::cout << "Test NULL moving image interpolator. " << std::endl;
+
+    try
+      {
+      fptr = dynamic_cast<FunctionType *>( registrator->GetDifferenceFunction().GetPointer() );
+      fptr->SetMovingImageInterpolator( NULL );
+      registrator->SetInput( initField );
+      registrator->Update();
+      }
+    catch( itk::ExceptionObject & err )
+      {
+      std::cout << "Caught expected error." << std::endl;
+      std::cout << err << std::endl;
+      }
+
+    if( !testPassed )
+      {
+      std::cout << "Test failed" << std::endl;
+      return EXIT_FAILURE;
+      }
     }
   catch( itk::ExceptionObject& err )
     {
-    std::cout << "Unexpected error." << std::endl;
+    std::cout << "Failed run with exception caught." << std::endl;
     std::cout << err << std::endl;
-    testPassed = false;
-    }
-
-  if( !testPassed )
-    {
-    std::cout << "Test failed" << std::endl;
-    return EXIT_FAILURE;
-    }
-
-  // --------------------------------------------------------------
-
-  std::cout << "Test exception handling." << std::endl;
-
-  std::cout << "Test NULL moving image. " << std::endl;
-
-  try
-    {
-    registrator->SetInput( caster->GetOutput() );
-    registrator->SetMovingImage( NULL );
-    registrator->Update();
-    }
-  catch( itk::ExceptionObject & err )
-    {
-    std::cout << "Caught expected error." << std::endl;
-    std::cout << err << std::endl;
-    }
-
-  if( !testPassed )
-    {
-    std::cout << "Test failed" << std::endl;
-    return EXIT_FAILURE;
-    }
-
-  registrator->SetMovingImage( moving );
-  registrator->ResetPipeline();
-
-  std::cout << "Test NULL moving image interpolator. " << std::endl;
-
-  try
-    {
-    fptr = dynamic_cast<FunctionType *>( registrator->GetDifferenceFunction().GetPointer() );
-    fptr->SetMovingImageInterpolator( NULL );
-    registrator->SetInput( initField );
-    registrator->Update();
-    }
-  catch( itk::ExceptionObject & err )
-    {
-    std::cout << "Caught expected error." << std::endl;
-    std::cout << err << std::endl;
-    }
-
-  if( !testPassed )
-    {
-    std::cout << "Test failed" << std::endl;
-    return EXIT_FAILURE;
+    exit( EXIT_FAILURE );
     }
 
   std::cout << "Test passed." << std::endl;
