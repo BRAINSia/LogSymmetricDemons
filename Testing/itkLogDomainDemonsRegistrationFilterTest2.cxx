@@ -126,7 +126,7 @@ int main(int, char * [] )
 
     // Declare fixed image
     ImageType::RegionType fixed_region;
-    ImageType::SizeType   fixed_size = {{50, 35, 50}};
+    const ImageType::SizeType   fixed_size = {{50, 35, 50}};
     ImageType::IndexType  fixed_index;
     fixed_index.Fill( 0 );
     fixed_region.SetSize( fixed_size );
@@ -143,7 +143,6 @@ int main(int, char * [] )
     fixed_origin.Fill( 0.5 );
 
     ImageType::Pointer fixed = ImageType::New();
-
     fixed->SetRegions( fixed_region );
     fixed->Allocate();
     fixed->SetDirection( fixed_direction );
@@ -151,6 +150,10 @@ int main(int, char * [] )
     fixed->SetOrigin( fixed_origin );
 
     // Fill the fixed image with a circle
+    const double               radius = 8.0;
+    const ImageType::PixelType fgnd = 250.0;
+    const ImageType::PixelType bgnd = 15.0;
+
     itk::Point<double, ImageDimension> center_pt_fixed;
     for( unsigned int i = 0; i < ImageDimension; ++i )
       {
@@ -159,10 +162,6 @@ int main(int, char * [] )
 
     itk::ContinuousIndex<double, ImageDimension> center_cind_fixed;
     fixed->TransformPhysicalPointToContinuousIndex( center_pt_fixed, center_cind_fixed);
-
-    const double               radius = 8.0;
-    const ImageType::PixelType fgnd = 250.0;
-    const ImageType::PixelType bgnd = 15.0;
 
     FillWithCircle<ImageType>( fixed, center_cind_fixed.GetDataPointer(),
       radius / fixed_spacing[0], fgnd, bgnd );
@@ -188,7 +187,6 @@ int main(int, char * [] )
     moving_origin.Fill( 1.5 );
 
     ImageType::Pointer moving = ImageType::New();
-
     moving->SetRegions( moving_region );
     moving->Allocate();
     moving->SetDirection( moving_direction );
@@ -207,7 +205,10 @@ int main(int, char * [] )
       radius / moving_spacing[0], fgnd, bgnd );
 
     WriteConstImage<ImageType>(moving.GetPointer(), "moving.mha");
+    // -------------------------------------------------------------
+    // -------------------------------------------------------------
 
+    // -------------------------------------------------------------
     // -------------------------------------------------------------
 
     std::cout << "Run registration and warp moving" << std::endl;

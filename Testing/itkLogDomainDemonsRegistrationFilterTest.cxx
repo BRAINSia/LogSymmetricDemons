@@ -126,7 +126,7 @@ int main(int, char * [] )
 
     // Declare fixed image
     ImageType::RegionType fixed_region;
-    ImageType::SizeType   fixed_size = {{128, 128}};
+    const ImageType::SizeType   fixed_size = {{128, 128}};
     ImageType::IndexType  fixed_index;
     fixed_index.Fill( 0 );
     fixed_region.SetSize( fixed_size );
@@ -134,47 +134,97 @@ int main(int, char * [] )
 
     ImageType::DirectionType fixed_direction;
     fixed_direction.SetIdentity();
-    //HACK 
-    //fixed_direction(1, 1) = -1;
+    // fixed_direction(1,1)=-1;
+
+    ImageType::SpacingType fixed_spacing;
+    fixed_spacing.Fill( 1.0 );
+
+    ImageType::PointType fixed_origin;
+    fixed_origin.Fill( 0.0 );
 
     ImageType::Pointer fixed = ImageType::New();
     fixed->SetRegions( fixed_region );
     fixed->Allocate();
     fixed->SetDirection( fixed_direction );
+    fixed->SetSpacing( fixed_spacing );
+    fixed->SetOrigin( fixed_origin );
+
+    // Fill the fixed image with a circle
+    const double               radius = 30.0;
+    const ImageType::PixelType fgnd = 250.0;
+    const ImageType::PixelType bgnd = 15.0;
+
+    itk::Point<double, ImageDimension> center_pt_fixed;
+
+      {
+      center_pt_fixed[0] = 62;
+      center_pt_fixed[1] = 64;
+      }
+
+    itk::ContinuousIndex<double, ImageDimension> center_cind_fixed;
+    fixed->TransformPhysicalPointToContinuousIndex( center_pt_fixed, center_cind_fixed);
+
+    FillWithCircle<ImageType>( fixed, center_cind_fixed.GetDataPointer(),
+      radius, fgnd, bgnd );
+
+    WriteConstImage<ImageType>(fixed.GetPointer(),"Fixed.nii.gz");
+
+    // Declare moving image
+    ImageType::RegionType moving_region;
+    ImageType::SizeType   moving_size = fixed_size;
+    ImageType::IndexType  moving_index;
+    moving_index.Fill( 0 );
+    moving_region.SetSize( moving_size );
+    moving_region.SetIndex( moving_index );
+
+    ImageType::DirectionType moving_direction;
+    // moving_direction.SetIdentity();
+    moving_direction = fixed_direction;
+
+    ImageType::SpacingType moving_spacing;
+    moving_spacing.Fill( 1.0 );
+
+    ImageType::PointType moving_origin;
+    moving_origin.Fill( 0.0 );
 
     ImageType::Pointer moving = ImageType::New();
-    moving->SetRegions( fixed_region );
+    moving->SetRegions( moving_region );
     moving->Allocate();
-    moving->SetDirection( fixed_direction );
+    moving->SetDirection( moving_direction );
+    moving->SetSpacing( moving_spacing );
+    moving->SetOrigin( moving_origin );
 
+    // Fill the moving image with a circle
+      {
+      center_pt_fixed[0] = 64;
+      center_pt_fixed[1] = 64;
+      }
+
+    itk::ContinuousIndex<double, ImageDimension> center_cind_moving;
+    moving->TransformPhysicalPointToContinuousIndex( center_pt_fixed, center_cind_moving);
+    FillWithCircle<ImageType>( moving, center_cind_moving.GetDataPointer(),
+      radius, fgnd, bgnd );
+
+    // -------------------------------------------------------------
+    // -------------------------------------------------------------
     FieldType::Pointer initField = FieldType::New();
     initField->SetRegions( fixed_region );
     initField->Allocate();
     initField->SetDirection( fixed_direction );
 
-    double               center[ImageDimension];
-    double               radius = 30.0;
-    ImageType::PixelType fgnd = 250.0;
-    ImageType::PixelType bgnd = 15.0;
-
-    // Fill the moving image with a circle
-    center[0] = 64; center[1] = 64;
-    FillWithCircle<ImageType>( moving, center, radius, fgnd, bgnd );
-
-    // Fill the fixed image with a circle
-    center[0] = 62; center[1] = 64;
-    FillWithCircle<ImageType>( fixed, center, radius, fgnd, bgnd );
-
     // Fill initial velocity field with null vectors
+      {
     VectorType zeroVec;
     zeroVec.Fill( 0.0 );
     initField->FillBuffer( zeroVec );
+      }
 
     typedef itk::VectorCastImageFilter<FieldType, FieldType> CasterType;
     CasterType::Pointer caster = CasterType::New();
     caster->SetInput( initField );
     caster->InPlaceOff();
 
+    // -------------------------------------------------------------
     // -------------------------------------------------------------
 
     std::cout << "Run registration and warp moving" << std::endl;
@@ -265,7 +315,6 @@ int main(int, char * [] )
 
     ImageType::Pointer warpedOutput = warper->GetOutput();
 
-    WriteConstImage<ImageType>(fixed.GetPointer(),"Fixed.nii.gz");
     WriteConstImage<ImageType>( warpedOutput.GetPointer(),"WarpedMoving.nii.gz");
 
     unsigned int numPixelsDifferent = 0;
