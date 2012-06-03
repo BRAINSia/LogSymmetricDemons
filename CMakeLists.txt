@@ -46,7 +46,7 @@ endforeach(Package)
 #If you're not sure what name to use, look in the Modules directory of your
 #cmake install and check that a file named Find(Package).cmake exists
 set(Optional_Packages
-  Matlab
+  #  Matlab
   )
 
 
