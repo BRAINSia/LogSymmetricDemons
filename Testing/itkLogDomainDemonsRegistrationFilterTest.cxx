@@ -6,8 +6,8 @@
 
 #include "itkLogDomainDemonsRegistrationFilter.h"
 
-#include "itkVectorCastImageFilter.h"
 #include "itkNearestNeighborInterpolateImageFunction.h"
+#include "itkVectorCastImageFilter.h"
 #include "itkWarpImageFilter.h"
 #include "itkImageFileWriter.h"
 

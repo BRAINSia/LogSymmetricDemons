@@ -6,11 +6,37 @@
 
 #include "itkLogDomainDemonsRegistrationFilter.h"
 
-#include "itkImageFileWriter.h"
 #include "itkNearestNeighborInterpolateImageFunction.h"
-#include "itkRescaleIntensityImageFilter.h"
 #include "itkVectorCastImageFilter.h"
 #include "itkWarpImageFilter.h"
+#include "itkImageFileWriter.h"
+
+/*
+ * This is the prefered ABI for Writing images.
+ * We know that the image is not going to change
+ * so make sure that the API indicates that.
+ */
+template <class ImageType>
+void
+WriteConstImage(const typename ImageType::ConstPointer image,
+                const std::string & filename)
+{
+  typedef itk::ImageFileWriter<ImageType> WriterType;
+  typename  WriterType::Pointer writer = WriterType::New();
+  writer->UseCompressionOn();
+  writer->SetFileName( filename.c_str() );
+  writer->SetInput(image);
+  try
+    {
+    writer->Update();
+    }
+  catch( itk::ExceptionObject & err )
+    {
+    std::cout << "Exception Object caught: " << std::endl;
+    std::cout << err << std::endl;
+    throw;
+    }
+}
 
 namespace
 {
@@ -76,24 +102,6 @@ FillWithCircle(TImage * image,
     }
 }
 
-template <class ImageType>
-void WriteImage( const ImageType & input, const std::string & filename )
-{
-  typedef itk::ImageFileWriter<ImageType> WriterType;
-  typename WriterType::Pointer writer = WriterType::New();
-
-  writer->SetInput( &input );
-  writer->SetFileName( filename.c_str() );
-
-  try
-    {
-    writer->Update();
-    }
-  catch( itk::ExceptionObject & e )
-    {
-    std::cerr << "Writer caught an exception: " << e.what() << std::endl;
-    }
-}
 
 // ----------------------------------------------
 
@@ -159,7 +167,7 @@ int main(int, char * [] )
     FillWithCircle<ImageType>( fixed, center_cind_fixed.GetDataPointer(),
       radius / fixed_spacing[0], fgnd, bgnd );
 
-    WriteImage<ImageType>(*fixed.GetPointer(), "fixed.mha");
+    WriteConstImage<ImageType>(fixed.GetPointer(), "fixed.mha");
 
     // Declare moving image
     ImageType::RegionType moving_region;
@@ -198,7 +206,7 @@ int main(int, char * [] )
     FillWithCircle<ImageType>( moving, center_cind_moving.GetDataPointer(),
       radius / moving_spacing[0], fgnd, bgnd );
 
-    WriteImage<ImageType>(*moving.GetPointer(), "moving.mha");
+    WriteConstImage<ImageType>(moving.GetPointer(), "moving.mha");
 
     // -------------------------------------------------------------
 
@@ -257,7 +265,8 @@ int main(int, char * [] )
 
     warper->Update();
 
-    WriteImage<ImageType>(*warper->GetOutput(), "warped-moving.mha");
+    ImageType::Pointer warpedOutput = warper->GetOutput();
+    WriteConstImage<ImageType>( warpedOutput.GetPointer(), "warped-moving.mha");
 
     // ---------------------------------------------------------
 
