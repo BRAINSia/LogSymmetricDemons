@@ -167,7 +167,7 @@ int main(int, char * [] )
     FillWithCircle<ImageType>( fixed, center_cind_fixed.GetDataPointer(),
       radius, fgnd, bgnd );
 
-    WriteConstImage<ImageType>(fixed.GetPointer(),"Fixed.nii.gz");
+    WriteConstImage<ImageType>(fixed.GetPointer(),"FIXED_LDDRFT1.nii.gz");
 
     // Declare moving image
     ImageType::RegionType moving_region;
@@ -195,16 +195,17 @@ int main(int, char * [] )
     moving->SetOrigin( moving_origin );
 
     // Fill the moving image with a circle
+    itk::ContinuousIndex<double, ImageDimension> center_cind_moving;
+    moving->TransformPhysicalPointToContinuousIndex( center_pt_fixed, center_cind_moving);
       {
       center_pt_fixed[0] = 64;
       center_pt_fixed[1] = 64;
       }
 
-    itk::ContinuousIndex<double, ImageDimension> center_cind_moving;
-    moving->TransformPhysicalPointToContinuousIndex( center_pt_fixed, center_cind_moving);
     FillWithCircle<ImageType>( moving, center_cind_moving.GetDataPointer(),
       radius, fgnd, bgnd );
 
+    WriteConstImage<ImageType>(moving.GetPointer(), "MOVING_LDDRFT1.nii.gz");
     // -------------------------------------------------------------
     // -------------------------------------------------------------
     FieldType::Pointer initField = FieldType::New();
@@ -214,9 +215,9 @@ int main(int, char * [] )
 
     // Fill initial velocity field with null vectors
       {
-    VectorType zeroVec;
-    zeroVec.Fill( 0.0 );
-    initField->FillBuffer( zeroVec );
+      VectorType zeroVec;
+      zeroVec.Fill( 0.0 );
+      initField->FillBuffer( zeroVec );
       }
 
     typedef itk::VectorCastImageFilter<FieldType, FieldType> CasterType;
@@ -244,11 +245,11 @@ int main(int, char * [] )
     registrator->SetNumberOfBCHApproximationTerms( 2 );
 
     // Turn on inplace execution
-    registrator->InPlaceOn();
+    //HACK registrator->InPlaceOn();
+    registrator->InPlaceOff();
 
     typedef RegistrationType::DemonsRegistrationFunctionType FunctionType;
-    FunctionType * fptr;
-    fptr = dynamic_cast<FunctionType *>( registrator->GetDifferenceFunction().GetPointer() );
+    FunctionType * fptr = dynamic_cast<FunctionType *>( registrator->GetDifferenceFunction().GetPointer() );
     fptr->Print( std::cout );
 
     // Exercise other member variables
@@ -315,7 +316,7 @@ int main(int, char * [] )
 
     ImageType::Pointer warpedOutput = warper->GetOutput();
 
-    WriteConstImage<ImageType>( warpedOutput.GetPointer(),"WarpedMoving.nii.gz");
+    WriteConstImage<ImageType>( warpedOutput.GetPointer(),"WARPEDMOVING_LDDRFT1.nii.gz");
 
     unsigned int numPixelsDifferent = 0;
     while( !fixedIter.IsAtEnd() )

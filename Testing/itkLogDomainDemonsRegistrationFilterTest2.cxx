@@ -207,6 +207,23 @@ int main(int, char * [] )
     WriteConstImage<ImageType>(moving.GetPointer(), "moving.mha");
     // -------------------------------------------------------------
     // -------------------------------------------------------------
+    //HACK TEST
+    FieldType::Pointer initField = FieldType::New();
+    initField->SetRegions( fixed_region );
+    initField->Allocate();
+    initField->SetDirection( fixed_direction );
+
+    // Fill initial velocity field with null vectors
+      {
+      VectorType zeroVec;
+      zeroVec.Fill( 0.0 );
+      initField->FillBuffer( zeroVec );
+      }
+
+    typedef itk::VectorCastImageFilter<FieldType, FieldType> CasterType;
+    CasterType::Pointer caster = CasterType::New();
+    caster->SetInput( initField );
+    caster->InPlaceOff();
 
     // -------------------------------------------------------------
     // -------------------------------------------------------------
@@ -216,6 +233,8 @@ int main(int, char * [] )
     typedef itk::LogDomainDemonsRegistrationFilter<ImageType, ImageType, FieldType> RegistrationType;
     RegistrationType::Pointer registrator = RegistrationType::New();
 
+    //HACK TEST Explicitly set InitialVelocityField to zeros!
+    registrator->SetInitialVelocityField( caster->GetOutput() );
     registrator->SetMovingImage( moving );
     registrator->SetFixedImage( fixed );
     registrator->SetNumberOfIterations( 100 );
@@ -228,6 +247,27 @@ int main(int, char * [] )
 
     // Turn on inplace execution
     // registrator->InPlaceOn();
+    registrator->InPlaceOff();
+
+    typedef RegistrationType::DemonsRegistrationFunctionType FunctionType;
+    FunctionType * fptr = dynamic_cast<FunctionType *>( registrator->GetDifferenceFunction().GetPointer() );
+    fptr->Print( std::cout );
+
+    // Exercise other member variables
+    std::cout << "Max. error for Gaussian operator approximation: "
+      << registrator->GetMaximumError()
+      << std::endl;
+    std::cout << "Max. Gaussian kernel width: "
+      << registrator->GetMaximumKernelWidth()
+      << std::endl;
+
+    // Set standards deviations
+    double v[ImageDimension];
+    for( unsigned int j = 0; j < ImageDimension; j++ )
+      {
+      v[j] = registrator->GetStandardDeviations()[j];
+      }
+    registrator->SetStandardDeviations( v );
 
     // Progress tracking
     typedef ShowProgressObject<RegistrationType> ProgressType;
