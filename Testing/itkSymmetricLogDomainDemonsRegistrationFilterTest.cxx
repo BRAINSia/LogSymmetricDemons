@@ -109,16 +109,16 @@ int main(int, char * [] )
   FieldType::Pointer initField = FieldType::New();
 
   moving->SetRegions( region );
-  moving->Allocate();
   moving->SetDirection( direction );
+  moving->Allocate();
 
   fixed->SetRegions( region );
-  fixed->Allocate();
   fixed->SetDirection( direction );
+  fixed->Allocate();
 
   initField->SetRegions( region );
-  initField->Allocate();
   initField->SetDirection( direction );
+  initField->Allocate();
 
   double               center[ImageDimension];
   double               radius = 30.0;

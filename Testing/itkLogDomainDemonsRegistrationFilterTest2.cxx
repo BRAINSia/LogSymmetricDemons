@@ -145,10 +145,10 @@ int main(int, char * [] )
 
     ImageType::Pointer fixed = ImageType::New();
     fixed->SetRegions( fixed_region );
-    fixed->Allocate();
     fixed->SetDirection( fixed_direction );
     fixed->SetSpacing( fixed_spacing );
     fixed->SetOrigin( fixed_origin );
+    fixed->Allocate();
 
     // Fill the fixed image with a circle
     const double               radius = 8.0;
@@ -189,10 +189,10 @@ int main(int, char * [] )
 
     ImageType::Pointer moving = ImageType::New();
     moving->SetRegions( moving_region );
-    moving->Allocate();
     moving->SetDirection( moving_direction );
     moving->SetSpacing( moving_spacing );
     moving->SetOrigin( moving_origin );
+    moving->Allocate();
 
     // Fill the moving image with a circle
     itk::ContinuousIndex<double, ImageDimension> center_cind_moving;
@@ -211,8 +211,10 @@ int main(int, char * [] )
     //HACK TEST
     FieldType::Pointer initField = FieldType::New();
     initField->SetRegions( fixed_region );
-    initField->Allocate();
     initField->SetDirection( fixed_direction );
+    initField->SetSpacing( fixed_spacing );
+    initField->SetOrigin(  fixed_origin );
+    initField->Allocate();
 
     // Fill initial velocity field with null vectors
       {

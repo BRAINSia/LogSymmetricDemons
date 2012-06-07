@@ -306,6 +306,12 @@ SymmetricLogDomainDemonsRegistrationFilter<TFixedImage, TMovingImage, TField>
   m_BackwardUpdateBuffer->SetRequestedRegion(output->GetRequestedRegion() );
   m_BackwardUpdateBuffer->SetBufferedRegion(output->GetBufferedRegion() );
   m_BackwardUpdateBuffer->Allocate();
+    {
+    typedef typename VelocityFieldType::PixelType        VectorType;
+    VectorType zeroVec;
+    zeroVec.Fill( 0.0 );
+    m_BackwardUpdateBuffer->FillBuffer( zeroVec );
+    }
 }
 
 // Smooth the backward update field using a separable Gaussian kernel

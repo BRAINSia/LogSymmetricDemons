@@ -414,25 +414,28 @@ void
 LogDomainDeformableRegistrationFilter<TFixedImage, TMovingImage, TField>
 ::SmoothGivenField(VelocityFieldType * field, const double StandardDeviations[ImageDimension])
 {
+  typedef typename VelocityFieldType::PixelType        VectorType;
+  typedef typename VectorType::ValueType               ScalarType;
+
   // copy field to TempField
   m_TempField->SetOrigin( field->GetOrigin() );
   m_TempField->SetSpacing( field->GetSpacing() );
   m_TempField->SetDirection( field->GetDirection() );
-  m_TempField->SetLargestPossibleRegion(
-    field->GetLargestPossibleRegion() );
-  m_TempField->SetRequestedRegion(
-    field->GetRequestedRegion() );
+  m_TempField->SetLargestPossibleRegion( field->GetLargestPossibleRegion() );
+  m_TempField->SetRequestedRegion( field->GetRequestedRegion() );
   m_TempField->SetBufferedRegion( field->GetBufferedRegion() );
   m_TempField->Allocate();
+    {
+    VectorType zeroVec;
+    zeroVec.Fill( 0.0 );
+    m_TempField->FillBuffer( zeroVec );
+    }
 
-  typedef typename VelocityFieldType::PixelType        VectorType;
-  typedef typename VectorType::ValueType               ScalarType;
   typedef GaussianOperator<ScalarType, ImageDimension> OperatorType;
-  typedef VectorNeighborhoodOperatorImageFilter<
-    VelocityFieldType,
-    VelocityFieldType>                                SmootherType;
+  OperatorType * const oper = new OperatorType;
 
-  OperatorType * oper = new OperatorType;
+  typedef VectorNeighborhoodOperatorImageFilter<
+    VelocityFieldType, VelocityFieldType>              SmootherType;
   typename SmootherType::Pointer smoother = SmootherType::New();
 
   typedef typename VelocityFieldType::PixelContainerPointer

@@ -135,10 +135,10 @@ int main(int, char * [] )
   ImageType::Pointer fixed = ImageType::New();
 
   fixed->SetRegions( fixed_region );
-  fixed->Allocate();
   fixed->SetDirection( fixed_direction );
   fixed->SetSpacing( fixed_spacing );
   fixed->SetOrigin( fixed_origin );
+  fixed->Allocate();
 
   // Fill the fixed image with a circle
   itk::Point<double, ImageDimension> center_pt_fixed;
@@ -180,10 +180,10 @@ int main(int, char * [] )
   ImageType::Pointer moving = ImageType::New();
 
   moving->SetRegions( moving_region );
-  moving->Allocate();
   moving->SetDirection( moving_direction );
   moving->SetSpacing( moving_spacing );
   moving->SetOrigin( moving_origin );
+  moving->Allocate();
 
   // Fill the moving image with a circle
   itk::ContinuousIndex<double, ImageDimension> center_cind_moving;

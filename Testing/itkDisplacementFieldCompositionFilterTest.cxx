@@ -48,6 +48,10 @@ int main(int, char * [] )
 
   // =============================================================
 
+  typedef typename VelocityFieldType::PixelType        VectorType;
+  VectorType zeroVec;
+  zeroVec.Fill( 0.0 );
+
   std::cout << "Create the left deformation field." << std::endl;
 
   FieldType::RegionType leftregion;
@@ -58,6 +62,7 @@ int main(int, char * [] )
   leftfield->SetLargestPossibleRegion( leftregion );
   leftfield->SetBufferedRegion( leftregion );
   leftfield->Allocate();
+  leftfield->FillBuffer( zeroVec );
 
   // /\todo fill the field with some meaningful stuff
 
@@ -73,6 +78,7 @@ int main(int, char * [] )
   rightfield->SetLargestPossibleRegion( rightregion );
   rightfield->SetBufferedRegion( rightregion );
   rightfield->Allocate();
+  rightfield->FillBuffer( zeroVec );
 
   // /\todo fill the field with some meaningful stuff
 
