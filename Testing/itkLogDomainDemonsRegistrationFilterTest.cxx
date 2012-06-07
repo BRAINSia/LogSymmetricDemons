@@ -36,6 +36,28 @@ WriteConstImage(const typename ImageType::ConstPointer image,
     std::cout << err << std::endl;
     throw;
     }
+  std::cout << "WROTE IMAGE: " << filename << std::endl;
+}
+static unsigned int VFcounter=0;
+
+std::string convertInt(const unsigned int number)
+{
+   std::string zerosPrefix="";
+   if( number < 10 )
+     {
+     zerosPrefix="000";
+     }
+   else if (number < 100 )
+     {
+     zerosPrefix="00";
+     }
+   else if (number < 1000 )
+     {
+     zerosPrefix="0";
+     }
+   std::stringstream ss;  //create a stringstream
+   ss << zerosPrefix << number;     //add number to the stream
+   return ss.str();  //return a string with the contents of the stream
 }
 
 namespace
@@ -62,6 +84,21 @@ public:
       {
       m_Process->StopRegistration();
       }
+    const unsigned int ImageDimension = 2;
+    typedef itk::Vector<float, ImageDimension>     VectorType;
+    typedef itk::Image<VectorType, ImageDimension> FieldType;
+    typename FieldType::Pointer VelField= this->m_Process->GetTempVelocityField();
+    if(VelField.IsNull())
+      {
+      std::cout << "VelField is Null" << std::endl;
+      }
+    else
+      {
+      const std::string thisIterName=std::string("TVField_")+convertInt(VFcounter)+std::string(".nii.gz");
+      std::cout << VelField << std::endl;
+      WriteConstImage<FieldType>( VelField.GetPointer(), thisIterName );
+      }
+    VFcounter++;
   }
 
   typename TRegistration::Pointer m_Process;
@@ -71,29 +108,34 @@ public:
 // Template function to fill in an image with a circle.
 template <class TImage>
 void
-FillWithCircle(TImage * image,
+FillWithCircle(typename TImage::Pointer image,
                double * center,
                double radius,
                typename TImage::PixelType foregnd,
                typename TImage::PixelType backgnd )
 {
+  const double r2 = vnl_math_sqr( radius );
+
+  typename TImage::IndexType index;
   typedef itk::ImageRegionIteratorWithIndex<TImage> Iterator;
   Iterator it( image, image->GetBufferedRegion() );
   it.GoToBegin();
-
-  typename TImage::IndexType index;
-  double r2 = vnl_math_sqr( radius );
   for( ; !it.IsAtEnd(); ++it )
     {
     index = it.GetIndex();
-    double distance = 0;
+    double d2 = 0.0;
     for( unsigned int j = 0; j < TImage::ImageDimension; j++ )
       {
-      distance += vnl_math_sqr( (double) index[j] - center[j]);
+      d2 += vnl_math_sqr( (double) index[j] - center[j]);
       }
-    if( distance <= r2 )
+    if( d2 <= r2 )
       {
-      it.Set( foregnd );
+#if 0 // A test case for debugging.
+      const double MaxFraction=1.0;
+      const double MinFraction=0.5;
+      it.Set( foregnd*(MaxFraction - MinFraction*(d2/r2) ));
+#endif
+      it.Set( foregnd*1.0 );
       }
     else
       {
@@ -104,7 +146,7 @@ FillWithCircle(TImage * image,
 
 // ----------------------------------------------
 
-int main(int, char * [] )
+int main(int argc, char * argv[] )
 {
   try
     {
@@ -144,10 +186,10 @@ int main(int, char * [] )
 
     ImageType::Pointer fixed = ImageType::New();
     fixed->SetRegions( fixed_region );
-    fixed->Allocate();
     fixed->SetDirection( fixed_direction );
     fixed->SetSpacing( fixed_spacing );
     fixed->SetOrigin( fixed_origin );
+    fixed->Allocate();
 
     // Fill the fixed image with a circle
     const double               radius = 30.0;
@@ -155,18 +197,16 @@ int main(int, char * [] )
     const ImageType::PixelType bgnd = 15.0;
 
     itk::Point<double, ImageDimension> center_pt_fixed;
-
       {
-      center_pt_fixed[0] = 62;
+      // HACK: center_pt_fixed[0] = 62;
+      center_pt_fixed[0] = 50;
       center_pt_fixed[1] = 64;
       }
-
     itk::ContinuousIndex<double, ImageDimension> center_cind_fixed;
     fixed->TransformPhysicalPointToContinuousIndex( center_pt_fixed, center_cind_fixed);
 
     FillWithCircle<ImageType>( fixed, center_cind_fixed.GetDataPointer(),
       radius, fgnd, bgnd );
-
     WriteConstImage<ImageType>(fixed.GetPointer(),"FIXED_LDDRFT1.nii.gz");
 
     // Declare moving image
@@ -178,8 +218,7 @@ int main(int, char * [] )
     moving_region.SetIndex( moving_index );
 
     ImageType::DirectionType moving_direction;
-    // moving_direction.SetIdentity();
-    moving_direction = fixed_direction;
+    moving_direction.SetIdentity();
 
     ImageType::SpacingType moving_spacing;
     moving_spacing.Fill( 1.0 );
@@ -189,29 +228,32 @@ int main(int, char * [] )
 
     ImageType::Pointer moving = ImageType::New();
     moving->SetRegions( moving_region );
-    moving->Allocate();
     moving->SetDirection( moving_direction );
     moving->SetSpacing( moving_spacing );
     moving->SetOrigin( moving_origin );
+    moving->Allocate();
 
     // Fill the moving image with a circle
-    itk::ContinuousIndex<double, ImageDimension> center_cind_moving;
-    moving->TransformPhysicalPointToContinuousIndex( center_pt_fixed, center_cind_moving);
+    itk::Point<double, ImageDimension> center_pt_moving;
       {
-      center_pt_fixed[0] = 64;
-      center_pt_fixed[1] = 64;
+      center_pt_moving[0] = 64;
+      center_pt_moving[1] = 64;
       }
+    itk::ContinuousIndex<double, ImageDimension> center_cind_moving;
+    moving->TransformPhysicalPointToContinuousIndex( center_pt_moving, center_cind_moving);
 
     FillWithCircle<ImageType>( moving, center_cind_moving.GetDataPointer(),
       radius, fgnd, bgnd );
-
     WriteConstImage<ImageType>(moving.GetPointer(), "MOVING_LDDRFT1.nii.gz");
+
     // -------------------------------------------------------------
     // -------------------------------------------------------------
     FieldType::Pointer initField = FieldType::New();
     initField->SetRegions( fixed_region );
-    initField->Allocate();
     initField->SetDirection( fixed_direction );
+    initField->SetSpacing ( fixed_spacing );
+    initField->SetOrigin ( fixed_origin );
+    initField->Allocate();
 
     // Fill initial velocity field with null vectors
       {
@@ -220,10 +262,12 @@ int main(int, char * [] )
       initField->FillBuffer( zeroVec );
       }
 
+#if 0 //HACK
     typedef itk::VectorCastImageFilter<FieldType, FieldType> CasterType;
     CasterType::Pointer caster = CasterType::New();
     caster->SetInput( initField );
     caster->InPlaceOff();
+#endif
 
     // -------------------------------------------------------------
     // -------------------------------------------------------------
@@ -233,7 +277,8 @@ int main(int, char * [] )
     typedef itk::LogDomainDemonsRegistrationFilter<ImageType, ImageType, FieldType> RegistrationType;
     RegistrationType::Pointer registrator = RegistrationType::New();
 
-    registrator->SetInitialVelocityField( caster->GetOutput() );
+    registrator->SetInitialVelocityField( initField );
+    // HACK registrator->SetInitialVelocityField( caster->GetOutput() );
     registrator->SetMovingImage( moving );
     registrator->SetFixedImage( fixed );
     registrator->SetNumberOfIterations( 200 );
@@ -285,8 +330,7 @@ int main(int, char * [] )
 
     // Interpolator
     typedef WarperType::CoordRepType CoordRepType;
-    typedef itk::NearestNeighborInterpolateImageFunction<ImageType, CoordRepType>
-      InterpolatorType;
+    typedef itk::NearestNeighborInterpolateImageFunction<ImageType, CoordRepType> InterpolatorType;
     InterpolatorType::Pointer interpolator = InterpolatorType::New();
 
     warper->SetInput( moving );
@@ -300,10 +344,10 @@ int main(int, char * [] )
     warper->SetOutputOrigin( fixed->GetOrigin() );
     warper->SetOutputDirection( fixed->GetDirection() );
     warper->SetEdgePaddingValue( bgnd );
-
     warper->Print( std::cout );
-
     warper->Update();
+
+
 
     // ---------------------------------------------------------
 
@@ -317,6 +361,7 @@ int main(int, char * [] )
     ImageType::Pointer warpedOutput = warper->GetOutput();
 
     WriteConstImage<ImageType>( warpedOutput.GetPointer(),"WARPEDMOVING_LDDRFT1.nii.gz");
+    WriteConstImage<FieldType>( registrator->GetDeformationField().GetPointer() , "DEFORMATION_FIELD.nii.gz");
 
     unsigned int numPixelsDifferent = 0;
     while( !fixedIter.IsAtEnd() )

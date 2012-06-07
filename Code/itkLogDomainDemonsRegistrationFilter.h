@@ -126,8 +126,10 @@ public:
 
   /** Set/Get the number of terms used in the Baker-Campbell-Hausdorff approximation. */
   virtual void SetNumberOfBCHApproximationTerms(unsigned int);
-
   virtual unsigned int GetNumberOfBCHApproximationTerms() const;
+
+  itkSetObjectMacro(TempVelocityField,VelocityFieldType);
+  itkGetObjectMacro(TempVelocityField,VelocityFieldType);
 
 protected:
   LogDomainDemonsRegistrationFilter();
@@ -167,8 +169,10 @@ private:
   typedef typename MultiplyByConstantType::Pointer MultiplyByConstantPointer;
   typedef typename BCHFilterType::Pointer          BCHFilterPointer;
 
-  MultiplyByConstantPointer m_Multiplier;
-  BCHFilterPointer          m_BCHFilter;
+  MultiplyByConstantPointer  m_Multiplier;
+  BCHFilterPointer           m_BCHFilter;
+  //HACK 
+  typename VelocityFieldType::Pointer m_TempVelocityField;
 
 };
 

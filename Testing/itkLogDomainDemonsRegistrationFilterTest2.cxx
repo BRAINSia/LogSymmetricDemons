@@ -36,6 +36,7 @@ WriteConstImage(const typename ImageType::ConstPointer image,
     std::cout << err << std::endl;
     throw;
     }
+  std::cout << "WROTE IMAGE: " << filename << std::endl;
 }
 
 namespace
