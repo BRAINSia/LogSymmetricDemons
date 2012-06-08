@@ -13,8 +13,7 @@ LogDomainDemonsRegistrationFilter<TFixedImage, TMovingImage, TField>
 {
   DemonsRegistrationFunctionPointer drfp = DemonsRegistrationFunctionType::New();
 
-  this->SetDifferenceFunction( static_cast<FiniteDifferenceFunctionType *>(
-                                 drfp.GetPointer() ) );
+  this->SetDifferenceFunction( drfp.GetPointer() );
 
   m_Multiplier = MultiplyByConstantType::New();
   m_Multiplier->InPlaceOn();
@@ -35,12 +34,10 @@ typename LogDomainDemonsRegistrationFilter<TFixedImage, TMovingImage, TField>
   {
   DemonsRegistrationFunctionType *drfp =
     dynamic_cast<DemonsRegistrationFunctionType *>(this->GetDifferenceFunction().GetPointer() );
-
   if( !drfp )
     {
     itkExceptionMacro( << "Could not cast difference function to SymmetricDemonsRegistrationFunction" );
     }
-
   return drfp;
   }
 
@@ -53,12 +50,10 @@ const typename LogDomainDemonsRegistrationFilter<TFixedImage, TMovingImage, TFie
   {
   const DemonsRegistrationFunctionType *drfp =
     dynamic_cast<const DemonsRegistrationFunctionType *>(this->GetDifferenceFunction().GetPointer() );
-
   if( !drfp )
     {
     itkExceptionMacro( << "Could not cast difference function to SymmetricDemonsRegistrationFunction" );
     }
-
   return drfp;
   }
 
@@ -70,14 +65,13 @@ LogDomainDemonsRegistrationFilter<TFixedImage, TMovingImage, TField>
 {
   // std::cout<<"LogDomainDemonsRegistrationFilter::InitializeIteration"<<std::endl;
   // update variables in the equation object
-  DemonsRegistrationFunctionType *f = this->DownCastDifferenceFunctionType();
+  DemonsRegistrationFunctionType * const f = this->DownCastDifferenceFunctionType();
 
 #if (ITK_VERSION_MAJOR < 4)
   f->SetDeformationField( this->GetDeformationField() );
 #else
   f->SetDisplacementField( this->GetDeformationField() );
 #endif
-
   // call the superclass  implementation ( initializes f )
   Superclass::InitializeIteration();
 }
@@ -88,8 +82,7 @@ double
 LogDomainDemonsRegistrationFilter<TFixedImage, TMovingImage, TField>
 ::GetMetric() const
 {
-  const DemonsRegistrationFunctionType *drfp = this->DownCastDifferenceFunctionType();
-
+  const DemonsRegistrationFunctionType * const drfp = this->DownCastDifferenceFunctionType();
   return drfp->GetMetric();
 }
 
@@ -99,8 +92,7 @@ double
 LogDomainDemonsRegistrationFilter<TFixedImage, TMovingImage, TField>
 ::GetIntensityDifferenceThreshold() const
 {
-  const DemonsRegistrationFunctionType *drfp = this->DownCastDifferenceFunctionType();
-
+  const DemonsRegistrationFunctionType * const drfp = this->DownCastDifferenceFunctionType();
   return drfp->GetIntensityDifferenceThreshold();
 }
 
@@ -110,8 +102,7 @@ void
 LogDomainDemonsRegistrationFilter<TFixedImage, TMovingImage, TField>
 ::SetIntensityDifferenceThreshold(double threshold)
 {
-  DemonsRegistrationFunctionType *drfp = this->DownCastDifferenceFunctionType();
-
+  DemonsRegistrationFunctionType * const drfp = this->DownCastDifferenceFunctionType();
   drfp->SetIntensityDifferenceThreshold(threshold);
 }
 
@@ -121,8 +112,7 @@ void
 LogDomainDemonsRegistrationFilter<TFixedImage, TMovingImage, TField>
 ::SetMaximumUpdateStepLength(double step)
 {
-  DemonsRegistrationFunctionType *drfp = this->DownCastDifferenceFunctionType();
-
+  DemonsRegistrationFunctionType * const drfp = this->DownCastDifferenceFunctionType();
   drfp->SetMaximumUpdateStepLength(step);
 }
 
@@ -132,8 +122,7 @@ double
 LogDomainDemonsRegistrationFilter<TFixedImage, TMovingImage, TField>
 ::GetMaximumUpdateStepLength() const
 {
-  const DemonsRegistrationFunctionType *drfp = this->DownCastDifferenceFunctionType();
-
+  const DemonsRegistrationFunctionType * const drfp = this->DownCastDifferenceFunctionType();
   return drfp->GetMaximumUpdateStepLength();
 }
 
@@ -161,8 +150,7 @@ const double &
 LogDomainDemonsRegistrationFilter<TFixedImage, TMovingImage, TField>
 ::GetRMSChange() const
 {
-  const DemonsRegistrationFunctionType *drfp = this->DownCastDifferenceFunctionType();
-
+  const DemonsRegistrationFunctionType * const drfp = this->DownCastDifferenceFunctionType();
   return drfp->GetRMSChange();
 }
 
@@ -172,8 +160,7 @@ typename LogDomainDemonsRegistrationFilter<TFixedImage, TMovingImage, TField>::G
 LogDomainDemonsRegistrationFilter<TFixedImage, TMovingImage, TField>
 ::GetUseGradientType() const
 {
-  const DemonsRegistrationFunctionType *drfp = this->DownCastDifferenceFunctionType();
-
+  const DemonsRegistrationFunctionType * const drfp = this->DownCastDifferenceFunctionType();
   return drfp->GetUseGradientType();
 }
 
@@ -183,8 +170,7 @@ void
 LogDomainDemonsRegistrationFilter<TFixedImage, TMovingImage, TField>
 ::SetUseGradientType(GradientType gtype)
 {
-  DemonsRegistrationFunctionType *drfp = this->DownCastDifferenceFunctionType();
-
+  DemonsRegistrationFunctionType * const drfp = this->DownCastDifferenceFunctionType();
   drfp->SetUseGradientType(gtype);
 }
 

@@ -48,7 +48,7 @@ int main(int, char * [] )
 
   // =============================================================
 
-  typedef typename VelocityFieldType::PixelType        VectorType;
+  typedef FieldType::PixelType        VectorType;
   VectorType zeroVec;
   zeroVec.Fill( 0.0 );
 

@@ -219,9 +219,10 @@ public:
    * computed over the the overlapping region between the two images.
    * This value is calculated for the current iteration */
   virtual double GetMetric() const
-  {
-    return 0;
-  }
+    {
+    return 12345.6789; //A silly value for the metric.
+    }
+
 protected:
   LogDomainDeformableRegistrationFilter();
   ~LogDomainDeformableRegistrationFilter()
