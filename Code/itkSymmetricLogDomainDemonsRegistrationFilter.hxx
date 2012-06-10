@@ -293,7 +293,7 @@ SymmetricLogDomainDemonsRegistrationFilter<TFixedImage, TMovingImage, TField>
     }
 
   // The backward update buffer looks just like the output.
-  VelocityFieldPointer output = this->GetOutput();
+  VelocityFieldPointer output = this->GetVelocityField();
 
   if( !m_BackwardUpdateBuffer )
     {
@@ -339,7 +339,7 @@ SymmetricLogDomainDemonsRegistrationFilter<TFixedImage, TMovingImage, TField>
   FiniteDifferenceFunctionType::NeighborhoodType    NeighborhoodIteratorType;
   typedef ImageRegionIterator<VelocityFieldType> UpdateIteratorType;
 
-  VelocityFieldPointer output = this->GetOutput();
+  VelocityFieldPointer output = this->GetVelocityField();
 
   // Get the FiniteDifferenceFunction to use in calculations.
   const typename FiniteDifferenceFunctionType::Pointer dff
@@ -485,10 +485,10 @@ SymmetricLogDomainDemonsRegistrationFilter<TFixedImage, TMovingImage, TField>
       }
 
     // Apply update
-    m_Adder->SetInput( 0, this->GetOutput() );
+    m_Adder->SetInput( 0, this->GetVelocityField() );
     m_Adder->SetInput( 1, this->GetUpdateBuffer() );
-    m_Adder->GraftOutput( this->GetOutput() );
-    m_Adder->GetOutput()->SetRequestedRegion( this->GetOutput()->GetRequestedRegion() );
+    m_Adder->GraftOutput( this->GetVelocityField() );
+    m_Adder->GetOutput()->SetRequestedRegion( this->GetVelocityField()->GetRequestedRegion() );
 
     // Triggers in place update
     m_Adder->Update();
@@ -537,10 +537,10 @@ SymmetricLogDomainDemonsRegistrationFilter<TFixedImage, TMovingImage, TField>
     bchfilter->SetNumberOfApproximationTerms( this->m_NumberOfBCHApproximationTerms );
 
     // First get Z( v, K_fluid * u_forward )
-    bchfilter->SetInput( 0, this->GetOutput() );
+    bchfilter->SetInput( 0, this->GetVelocityField() );
     bchfilter->SetInput( 1, this->GetUpdateBuffer() );
 
-    bchfilter->GetOutput()->SetRequestedRegion( this->GetOutput()->GetRequestedRegion() );
+    bchfilter->GetOutput()->SetRequestedRegion( this->GetVelocityField()->GetRequestedRegion() );
     bchfilter->Update();
     VelocityFieldPointer Zf = bchfilter->GetOutput();
     Zf->DisconnectPipeline();
@@ -550,13 +550,13 @@ SymmetricLogDomainDemonsRegistrationFilter<TFixedImage, TMovingImage, TField>
       VelocityFieldType, VelocityFieldType>  OppositeFilterType;
 
     typename OppositeFilterType::Pointer oppositefilter = OppositeFilterType::New();
-    oppositefilter->SetInput( this->GetOutput() );
+    oppositefilter->SetInput( this->GetVelocityField() );
     oppositefilter->InPlaceOn();
 
     bchfilter->SetInput( 0, oppositefilter->GetOutput() );
     bchfilter->SetInput( 1, this->GetBackwardUpdateBuffer() );
 
-    bchfilter->GetOutput()->SetRequestedRegion( this->GetOutput()->GetRequestedRegion() );
+    bchfilter->GetOutput()->SetRequestedRegion( this->GetVelocityField()->GetRequestedRegion() );
     bchfilter->Update();
     VelocityFieldPointer Zb = bchfilter->GetOutput();
     Zb->DisconnectPipeline();
@@ -569,14 +569,14 @@ SymmetricLogDomainDemonsRegistrationFilter<TFixedImage, TMovingImage, TField>
     subtracter->SetInput( 0, Zf );
     subtracter->SetInput( 1, Zb );
 
-    subtracter->GraftOutput( this->GetOutput() );
+    subtracter->GraftOutput( this->GetVelocityField() );
 
     m_Multiplier->SetConstant( 0.5 );
     m_Multiplier->SetInput( subtracter->GetOutput() );
-    m_Multiplier->GraftOutput( this->GetOutput() );
+    m_Multiplier->GraftOutput( this->GetVelocityField() );
 
     // Triggers in place update
-    m_Multiplier->GetOutput()->SetRequestedRegion( this->GetOutput()->GetRequestedRegion() );
+    m_Multiplier->GetOutput()->SetRequestedRegion( this->GetVelocityField()->GetRequestedRegion() );
     m_Multiplier->Update();
 
     // Region passing stuff

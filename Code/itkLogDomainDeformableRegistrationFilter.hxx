@@ -300,7 +300,7 @@ LogDomainDeformableRegistrationFilter<TFixedImage, TMovingImage, TField>
       zeros[j] = 0;
       }
 
-    typename OutputImageType::Pointer output = this->GetOutput();
+    typename OutputImageType::Pointer output = this->GetVelocityField();
 
     ImageRegionIterator<OutputImageType> out(output, output->GetRequestedRegion() );
 
@@ -375,7 +375,7 @@ LogDomainDeformableRegistrationFilter<TFixedImage, TMovingImage, TField>
   VelocityFieldPointer inputPtr =
     const_cast<VelocityFieldType *>( this->GetInput(VELOCITYFIELD_IMAGE_CODE) );
 #endif
-  VelocityFieldPointer outputPtr = this->GetOutput();
+  VelocityFieldPointer outputPtr = this->GetVelocityField();
   FixedImagePointer    fixedPtr = const_cast<FixedImageType *>( this->GetFixedImage() );
 
   if( inputPtr )
@@ -417,7 +417,7 @@ LogDomainDeformableRegistrationFilter<TFixedImage, TMovingImage, TField>
 ::SmoothVelocityField()
 {
   // The output buffer will be overwritten with new data.
-  this->SmoothGivenField(this->GetOutput(), this->m_StandardDeviations);
+  this->SmoothGivenField(this->GetVelocityField(), this->m_StandardDeviations);
 }
 
 // Smooth update field using a separable Gaussian kernel

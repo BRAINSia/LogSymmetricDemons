@@ -207,18 +207,18 @@ LogDomainDemonsRegistrationFilter<TFixedImage, TMovingImage, TField>
     }
 
   // Apply update by using BCH approximation
-  m_BCHFilter->SetInput( 0, this->GetOutput() );
+  m_BCHFilter->SetInput( 0, this->GetVelocityField() );
   m_BCHFilter->SetInput( 1, this->GetUpdateBuffer() );
   if( m_BCHFilter->GetInPlace() )
     {
-    m_BCHFilter->GraftOutput( this->GetOutput() );
+    m_BCHFilter->GraftOutput( this->GetVelocityField() );
     }
   else
     {
     // Work-around for http://www.itk.org/Bug/view.php?id=8672
     m_BCHFilter->GraftOutput( DeformationFieldType::New() );
     }
-  m_BCHFilter->GetOutput()->SetRequestedRegion( this->GetOutput()->GetRequestedRegion() );
+  m_BCHFilter->GetOutput()->SetRequestedRegion( this->GetVelocityField()->GetRequestedRegion() );
 
   // Triggers in place update
   m_BCHFilter->Update();
@@ -226,7 +226,7 @@ LogDomainDemonsRegistrationFilter<TFixedImage, TMovingImage, TField>
   // Region passing stuff
   this->GraftOutput( m_BCHFilter->GetOutput() );
   //this->m_TempVelocityField = m_BCHFilter->GetOutput();
-  this->m_TempVelocityField = this->GetOutput();
+  this->m_TempVelocityField = this->GetVelocityField();
 
   // Smooth the velocity field
   if( this->GetSmoothVelocityField() )
