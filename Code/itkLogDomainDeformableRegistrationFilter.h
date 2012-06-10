@@ -10,7 +10,7 @@ namespace itk
 
   //HACK:  These global code should be converted to string and then better incorporated.
 typedef enum {
-  VELOCITYFIELD=0,
+  VELOCITYFIELD_IMAGE_CODE=0,
   FIXED_IMAGE_CODE=1,
   MOVING_IMAGE_CODE=2
 } INPUT_CODES;
@@ -135,21 +135,11 @@ public:
   const MovingImageType * GetMovingImage(void) const;
 
   /** Set initial velocity field. */
-  void SetInitialVelocityField( VelocityFieldType * ptr )
-  {
-#if (ITK_VERSION_MAJOR < 4)
-    this->SetInput( ptr );
-#else
-    this->SetNthInput( 2, ptr );
-#endif
-  }
+  void SetInitialVelocityField( VelocityFieldType * ptr );
 
   /** Get output velocity field. */
   //HACK: const VelocityFieldType * GetVelocityField(void) const;
-  VelocityFieldType * GetVelocityField()
-  {
-    return this->GetOutput();
-  }
+  VelocityFieldType * GetVelocityField(void);
 
   /** Get output deformation field. */
   DeformationFieldPointer GetDeformationField();
