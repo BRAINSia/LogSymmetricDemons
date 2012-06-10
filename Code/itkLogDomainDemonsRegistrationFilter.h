@@ -171,7 +171,7 @@ private:
 
   MultiplyByConstantPointer  m_Multiplier;
   BCHFilterPointer           m_BCHFilter;
-  //HACK 
+  //HACK
   typename VelocityFieldType::Pointer m_TempVelocityField;
 
 };

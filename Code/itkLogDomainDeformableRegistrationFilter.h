@@ -8,6 +8,13 @@
 namespace itk
 {
 
+  //HACK:  These global code should be converted to string and then better incorporated.
+typedef enum {
+  VELOCITYFIELD=0,
+  FIXED_IMAGE_CODE=1,
+  MOVING_IMAGE_CODE=2
+} INPUT_CODES;
+
 /**
  * \class LogDomainDeformableRegistrationFilter
  * \brief Deformably register two images using a PDE-like algorithm
@@ -102,18 +109,18 @@ public:
   /** Types inherithed from the superclass */
   typedef typename Superclass::OutputImageType OutputImageType;
 
+  /** The value type of a time step.  Inherited from the superclass. */
+  typedef typename Superclass::TimeStepType TimeStepType;
+
   /** FiniteDifferenceFunction type. */
-  typedef typename Superclass::FiniteDifferenceFunctionType
-  FiniteDifferenceFunctionType;
+  typedef typename Superclass::FiniteDifferenceFunctionType FiniteDifferenceFunctionType;
 
   /** PDEDeformableRegistrationFunction type. */
-  typedef PDEDeformableRegistrationFunction<FixedImageType, MovingImageType,
-                                            DeformationFieldType>
-  PDEDeformableRegistrationFunctionType;
+  typedef PDEDeformableRegistrationFunction< FixedImageType, MovingImageType,
+          DeformationFieldType> PDEDeformableRegistrationFunctionType;
 
   /** Inherit some enums and typedefs from the superclass. */
-  itkStaticConstMacro(ImageDimension, unsigned int,
-                      Superclass::ImageDimension);
+  itkStaticConstMacro(ImageDimension, unsigned int, Superclass::ImageDimension);
 
   /** Set the fixed image. */
   void SetFixedImage( const FixedImageType * ptr );
@@ -138,6 +145,7 @@ public:
   }
 
   /** Get output velocity field. */
+  //HACK: const VelocityFieldType * GetVelocityField(void) const;
   VelocityFieldType * GetVelocityField()
   {
     return this->GetOutput();

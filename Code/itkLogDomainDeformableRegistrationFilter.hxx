@@ -65,8 +65,8 @@ LogDomainDeformableRegistrationFilter<TFixedImage, TMovingImage, TField>
 // Get the fixed image.
 template <class TFixedImage, class TMovingImage, class TField>
 const typename LogDomainDeformableRegistrationFilter<TFixedImage, TMovingImage, TField>
-::FixedImageType
-* LogDomainDeformableRegistrationFilter<TFixedImage, TMovingImage, TField>
+::FixedImageType *
+LogDomainDeformableRegistrationFilter<TFixedImage, TMovingImage, TField>
 ::GetFixedImage() const
   {
   return dynamic_cast<const FixedImageType *>

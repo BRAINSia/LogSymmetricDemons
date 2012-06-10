@@ -68,21 +68,21 @@ template <typename TRegistration>
 class ShowProgressObject
 {
 public:
-  ShowProgressObject(TRegistration* o)
+  ShowProgressObject(typename TRegistration::Pointer o)
   {
-    m_Process = o;
+    this->m_Process = o;
   }
 
   void ShowProgress()
   {
-    std::cout << "Progress: " << m_Process->GetProgress() << "  ";
-    std::cout << "Iter: " << m_Process->GetElapsedIterations() << "  ";
-    std::cout << "Metric: "   << m_Process->GetMetric()   << "  ";
-    std::cout << "RMSChange: " << m_Process->GetRMSChange() << "  ";
+    std::cout << "Progress: " << this->m_Process->GetProgress() << "  ";
+    std::cout << "Iter: " << this->m_Process->GetElapsedIterations() << "  ";
+    std::cout << "Metric: "   << this->m_Process->GetMetric()   << "  ";
+    std::cout << "RMSChange: " << this->m_Process->GetRMSChange() << "  ";
     std::cout << std::endl;
-    if( m_Process->GetElapsedIterations() == 150 )
+    if( this->m_Process->GetElapsedIterations() == 150 )
       {
-      m_Process->StopRegistration();
+      this->m_Process->StopRegistration();
       }
     const unsigned int ImageDimension = 2;
     typedef itk::Vector<float, ImageDimension>     VectorType;
@@ -109,20 +109,17 @@ public:
 template <class TImage>
 void
 FillWithCircle(typename TImage::Pointer image,
-               double * center,
-               double radius,
-               typename TImage::PixelType foregnd,
-               typename TImage::PixelType backgnd )
+               const double * const center,
+               const double radius,
+               const typename TImage::PixelType foregnd,
+               const typename TImage::PixelType backgnd )
 {
   const double r2 = vnl_math_sqr( radius );
 
-  typename TImage::IndexType index;
   typedef itk::ImageRegionIteratorWithIndex<TImage> Iterator;
-  Iterator it( image, image->GetBufferedRegion() );
-  it.GoToBegin();
-  for( ; !it.IsAtEnd(); ++it )
+  for( Iterator it( image, image->GetBufferedRegion() ) ; !it.IsAtEnd(); ++it )
     {
-    index = it.GetIndex();
+    const typename TImage::IndexType & index = it.GetIndex();
     double d2 = 0.0;
     for( unsigned int j = 0; j < TImage::ImageDimension; j++ )
       {
@@ -196,18 +193,21 @@ int main(int argc, char * argv[] )
     const ImageType::PixelType fgnd = 250.0;
     const ImageType::PixelType bgnd = 15.0;
 
-    itk::Point<double, ImageDimension> center_pt_fixed;
       {
-      center_pt_fixed[0] = 62;
-      // HACK: center_pt_fixed[0] = 62;
-      //       center_pt_fixed[0] = 50;
-      center_pt_fixed[1] = 64;
-      }
-    itk::ContinuousIndex<double, ImageDimension> center_cind_fixed;
-    fixed->TransformPhysicalPointToContinuousIndex( center_pt_fixed, center_cind_fixed);
+      itk::Point<double, ImageDimension> center_pt_fixed;
+        {
+        // HACK: center_pt_fixed[0] = 62;
+        // center_pt_fixed[0] = 50;
+        center_pt_fixed[0] = 62;
+        center_pt_fixed[1] = 64;
+        }
 
-    FillWithCircle<ImageType>( fixed, center_cind_fixed.GetDataPointer(),
-      radius, fgnd, bgnd );
+      itk::ContinuousIndex<double, ImageDimension> center_cind_fixed;
+      fixed->TransformPhysicalPointToContinuousIndex( center_pt_fixed, center_cind_fixed);
+
+      FillWithCircle<ImageType>( fixed, center_cind_fixed.GetDataPointer(),
+        radius, fgnd, bgnd );
+      }
     WriteConstImage<ImageType>(fixed.GetPointer(),"FIXED_LDDRFT1.nii.gz");
 
     // Declare moving image
@@ -234,17 +234,19 @@ int main(int argc, char * argv[] )
     moving->SetOrigin( moving_origin );
     moving->Allocate();
 
-    // Fill the moving image with a circle
-    itk::Point<double, ImageDimension> center_pt_moving;
       {
-      center_pt_moving[0] = 64;
-      center_pt_moving[1] = 64;
-      }
-    itk::ContinuousIndex<double, ImageDimension> center_cind_moving;
-    moving->TransformPhysicalPointToContinuousIndex( center_pt_moving, center_cind_moving);
+      // Fill the moving image with a circle
+      itk::Point<double, ImageDimension> center_pt_moving;
+        {
+        center_pt_moving[0] = 64;
+        center_pt_moving[1] = 64;
+        }
+      itk::ContinuousIndex<double, ImageDimension> center_cind_moving;
+      moving->TransformPhysicalPointToContinuousIndex( center_pt_moving, center_cind_moving);
 
-    FillWithCircle<ImageType>( moving, center_cind_moving.GetDataPointer(),
-      radius, fgnd, bgnd );
+      FillWithCircle<ImageType>( moving, center_cind_moving.GetDataPointer(),
+        radius, fgnd, bgnd );
+      }
     WriteConstImage<ImageType>(moving.GetPointer(), "MOVING_LDDRFT1.nii.gz");
 
     // -------------------------------------------------------------
@@ -294,18 +296,17 @@ int main(int argc, char * argv[] )
     //HACK registrator->InPlaceOn();
     registrator->InPlaceOff();
 
-    typedef RegistrationType::DemonsRegistrationFunctionType FunctionType;
-    FunctionType * fptr = dynamic_cast<FunctionType *>( registrator->GetDifferenceFunction().GetPointer() );
+    typedef RegistrationType::DemonsRegistrationFunctionType LDDRFunctionType;
+    LDDRFunctionType::Pointer fptr = dynamic_cast<LDDRFunctionType *>( registrator->GetDifferenceFunction().GetPointer() );
     fptr->Print( std::cout );
 
     // Exercise other member variables
     std::cout << "Max. error for Gaussian operator approximation: "
-      << registrator->GetMaximumError()
-      << std::endl;
+      << registrator->GetMaximumError() << std::endl;
     std::cout << "Max. Gaussian kernel width: "
-      << registrator->GetMaximumKernelWidth()
-      << std::endl;
+      << registrator->GetMaximumKernelWidth() << std::endl;
 
+    {
     // Set standards deviations
     double v[ImageDimension];
     for( unsigned int j = 0; j < ImageDimension; j++ )
@@ -313,16 +314,16 @@ int main(int argc, char * argv[] )
       v[j] = registrator->GetStandardDeviations()[j];
       }
     registrator->SetStandardDeviations( v );
+    }
 
     // Progress tracking
-    typedef ShowProgressObject<RegistrationType> ProgressType;
-    ProgressType                                    progressWatch(registrator);
-    itk::SimpleMemberCommand<ProgressType>::Pointer command;
-    command = itk::SimpleMemberCommand<ProgressType>::New();
-    command->SetCallbackFunction(&progressWatch,
-      &ProgressType::ShowProgress);
-    registrator->AddObserver( itk::ProgressEvent(), command);
-
+      // HACK comamnd is going out of scope here with this code block {
+      typedef ShowProgressObject<RegistrationType> ProgressType;
+      ProgressType                                    progressWatch(registrator);
+      itk::SimpleMemberCommand<ProgressType>::Pointer command = itk::SimpleMemberCommand<ProgressType>::New();
+      command->SetCallbackFunction(&progressWatch, &ProgressType::ShowProgress);
+      registrator->AddObserver( itk::ProgressEvent(), command);
+     // }
     registrator->Update();
 
     // Warper for the moving image
@@ -348,16 +349,12 @@ int main(int argc, char * argv[] )
     warper->Print( std::cout );
     warper->Update();
 
-
-
     // ---------------------------------------------------------
 
     std::cout << "Compare warped moving and fixed." << std::endl;
 
-    itk::ImageRegionIterator<ImageType> fixedIter( fixed,
-      fixed->GetBufferedRegion() );
-    itk::ImageRegionIterator<ImageType> warpedIter( warper->GetOutput(),
-      fixed->GetBufferedRegion() );
+    itk::ImageRegionIterator<ImageType> fixedIter( fixed, fixed->GetBufferedRegion() );
+    itk::ImageRegionIterator<ImageType> warpedIter( warper->GetOutput(), fixed->GetBufferedRegion() );
 
     ImageType::Pointer warpedOutput = warper->GetOutput();
 
@@ -375,9 +372,7 @@ int main(int argc, char * argv[] )
       ++warpedIter;
       }
 
-    std::cout << "Number of pixels that differ: " << numPixelsDifferent;
-    std::cout << std::endl;
-
+    std::cout << "Number of pixels that differ: " << numPixelsDifferent << std::endl;
     if( numPixelsDifferent > 10 )
       {
       std::cout << "Test failed - too many pixels differ." << std::endl;
@@ -439,17 +434,15 @@ int main(int argc, char * argv[] )
 
     try
       {
-      fptr = dynamic_cast<FunctionType *>( registrator->GetDifferenceFunction().GetPointer() );
+      fptr = dynamic_cast<LDDRFunctionType *>( registrator->GetDifferenceFunction().GetPointer() );
       fptr->SetMovingImageInterpolator( NULL );
       registrator->SetInput( initField );
       registrator->Update();
       }
     catch( itk::ExceptionObject & err )
       {
+      std::cout << "Caught expected error." << std::endl;
       std::cout << err << std::endl;
-      std::cout << "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^" << std::endl;
-      std::cout << "Excpected exception properly handled by ignoring the above error." << std::endl;
-      std::cout << "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^" << std::endl;
       }
 #endif
     if( !testPassed )

@@ -1,5 +1,5 @@
-#ifndef __itkExponentialDisplacementFieldImageFilter_LSD2_txx
-#define __itkExponentialDisplacementFieldImageFilter_LSD2_txx
+#ifndef __itkExponentialDisplacementFieldImageFilter_LSD_hxx
+#define __itkExponentialDisplacementFieldImageFilter_LSD_hxx
 
 #include "itkExponentialDisplacementFieldImageFilter_LSD.h"
 #include "itkProgressReporter.h"
