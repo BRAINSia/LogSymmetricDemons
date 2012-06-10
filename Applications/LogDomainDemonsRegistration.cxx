@@ -37,7 +37,7 @@ struct arguments
   std::string inputTransformFile; /* -p option */
   std::string outputImageFile;    /* -o option */
   std::string outputDeformationFieldFile;
-  std::string outputInverseDeformationFieldFile;
+  std::string outputInverseDisplacementFieldFile;
   std::string outputVelocityFieldFile;
   std::string trueFieldFile;                  /* -r option */
   std::vector<unsigned int> numIterations;    /* -i option */
@@ -103,7 +103,7 @@ struct arguments
            << "  Input transform file: " << args.inputTransformFile << std::endl
            << "  Output image file: " << args.outputImageFile << std::endl
            << "  Output deformation field file: " << args.outputDeformationFieldFile << std::endl
-           << "  Output inverse deformation field file: " << args.outputInverseDeformationFieldFile << std::endl
+           << "  Output inverse deformation field file: " << args.outputInverseDisplacementFieldFile << std::endl
            << "  Output velocity field file: " << args.outputVelocityFieldFile << std::endl
            << "  True deformation field file: " << args.trueFieldFile << std::endl
            << "  Number of multiresolution levels: " << args.numIterations.size() << std::endl
@@ -229,9 +229,9 @@ void parseOpts(int argc, char * *argv, struct arguments & args)
   command.AddOptionField("OutputDeformationFieldFile", "filename", MetaCommand::STRING, false,
                          "OUTPUTIMAGENAME-deformationField.mha");
 
-  command.SetOption("OutputInverseDeformationFieldFile", "", false, "Output inverse deformation field filename");
-  command.SetOptionLongTag("OutputInverseDeformationFieldFile", "outputInvDef-field");
-  command.AddOptionField("OutputInverseDeformationFieldFile", "filename", MetaCommand::STRING, false,
+  command.SetOption("OutputInverseDisplacementFieldFile", "", false, "Output inverse deformation field filename");
+  command.SetOptionLongTag("OutputInverseDisplacementFieldFile", "outputInvDef-field");
+  command.AddOptionField("OutputInverseDisplacementFieldFile", "filename", MetaCommand::STRING, false,
                          "OUTPUTIMAGENAME-inverseDeformationField.mha");
 
   command.SetOption("OutputVelocityFieldFile", "", false, "Output velocity field filename");
@@ -311,7 +311,7 @@ void parseOpts(int argc, char * *argv, struct arguments & args)
   args.outputImageFile = command.GetValueAsString("OutputImageFile", "filename");
 
   args.outputDeformationFieldFile = command.GetValueAsString("OutputDeformationFieldFile", "filename");
-  args.outputInverseDeformationFieldFile = command.GetValueAsString("OutputInverseDeformationFieldFile", "filename");
+  args.outputInverseDisplacementFieldFile = command.GetValueAsString("OutputInverseDisplacementFieldFile", "filename");
   args.outputVelocityFieldFile = command.GetValueAsString("OutputVelocityFieldFile", "filename");
 
   unsigned int pos = args.outputImageFile.rfind(".");
@@ -331,18 +331,18 @@ void parseOpts(int argc, char * *argv, struct arguments & args)
     }
 
   // Change the extension by -inverseDeformationField.mha
-  if( args.outputInverseDeformationFieldFile == "OUTPUTIMAGENAME-inverseDeformationField.mha" )
+  if( args.outputInverseDisplacementFieldFile == "OUTPUTIMAGENAME-inverseDeformationField.mha" )
     {
-    if( pos < args.outputInverseDeformationFieldFile.size() )
+    if( pos < args.outputInverseDisplacementFieldFile.size() )
       {
-      args.outputInverseDeformationFieldFile = args.outputImageFile;
-      args.outputInverseDeformationFieldFile.replace(pos,
-                                                     args.outputInverseDeformationFieldFile.size(),
+      args.outputInverseDisplacementFieldFile = args.outputImageFile;
+      args.outputInverseDisplacementFieldFile.replace(pos,
+                                                     args.outputInverseDisplacementFieldFile.size(),
                                                      "-inverseDeformationField.mha");
       }
     else
       {
-      args.outputInverseDeformationFieldFile = args.outputImageFile + "-inverseDeformationField.mha";
+      args.outputInverseDisplacementFieldFile = args.outputImageFile + "-inverseDeformationField.mha";
       }
     }
 
@@ -998,7 +998,7 @@ void LogDomainDemonsRegistrationFunction( arguments args )
     defField->DisconnectPipeline();
 
     // Inverse final deformation field
-    invDefField = multires->GetInverseDeformationField();
+    invDefField = multires->GetInverseDisplacementField();
     invDefField->DisconnectPipeline();
 
     // Final velocity field
@@ -1071,7 +1071,7 @@ void LogDomainDemonsRegistrationFunction( arguments args )
     }
 
   // Write output inverse deformation field
-  if( !args.outputInverseDeformationFieldFile.empty() )
+  if( !args.outputInverseDisplacementFieldFile.empty() )
     {
     // Write the inverse deformation field as an image of vectors.
     // Note that the file format used for writing the inverse deformation field must be
@@ -1079,7 +1079,7 @@ void LogDomainDemonsRegistrationFunction( arguments args )
     // for the MetaImage and VTK file formats for example.
     typedef itk::ImageFileWriter<DeformationFieldType> FieldWriterType;
     typename FieldWriterType::Pointer fieldWriter = FieldWriterType::New();
-    fieldWriter->SetFileName(  args.outputInverseDeformationFieldFile.c_str() );
+    fieldWriter->SetFileName(  args.outputInverseDisplacementFieldFile.c_str() );
     fieldWriter->SetInput( invDefField );
     fieldWriter->SetUseCompression( true );
 

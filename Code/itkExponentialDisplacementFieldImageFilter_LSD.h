@@ -1,5 +1,5 @@
-#ifndef __itkExponentialDeformationFieldImageFilter2_h
-#define __itkExponentialDeformationFieldImageFilter2_h
+#ifndef __itkExponentialDisplacementFieldImageFilter_LSD_h
+#define __itkExponentialDisplacementFieldImageFilter_LSD_h
 
 #include "itkImageToImageFilter.h"
 #include "itkDivideByConstantImageFilter.h"
@@ -12,11 +12,11 @@
 namespace itk
 {
 
-/** \class ExponentialDeformationFieldImageFilter
+/** \class ExponentialDisplacementFieldImageFilter_LSD
  * \brief Computes a diffeomorphic deformation field as the Lie group
  * exponential of a vector field.
  *
- * ExponentialDeformationFieldImageFilter takes a 'smooth' vector field
+ * ExponentialDisplacementFieldImageFilter_LSD takes a 'smooth' vector field
  * as input and computes the deformation field that is its exponential.
  *
  * Given that both the input and output deformation field are represented as
@@ -45,12 +45,12 @@ namespace itk
  * \ingroup ImageToImageFilter
  */
 template <class TInputImage, class TOutputImage>
-class ITK_EXPORT ExponentialDeformationFieldImageFilter :
+class ITK_EXPORT ExponentialDisplacementFieldImageFilter_LSD :
   public ImageToImageFilter<TInputImage, TOutputImage>
 {
 public:
   /** Standard class typedefs. */
-  typedef ExponentialDeformationFieldImageFilter        Self;
+  typedef ExponentialDisplacementFieldImageFilter_LSD        Self;
   typedef ImageToImageFilter<TInputImage, TOutputImage> Superclass;
   typedef SmartPointer<Self>                            Pointer;
   typedef SmartPointer<const Self>                      ConstPointer;
@@ -59,7 +59,7 @@ public:
   itkNewMacro(Self);
 
   /** Run-time type information (and related methods). */
-  itkTypeMacro(ExponentialDeformationFieldImageFilter, ImageToImageFilter);
+  itkTypeMacro(ExponentialDisplacementFieldImageFilter_LSD, ImageToImageFilter);
 
   /** Some convenient typedefs. */
   typedef TInputImage                            InputImageType;
@@ -116,8 +116,8 @@ public:
   /** End concept checking */
 #endif
 protected:
-  ExponentialDeformationFieldImageFilter();
-  virtual ~ExponentialDeformationFieldImageFilter()
+  ExponentialDisplacementFieldImageFilter_LSD();
+  virtual ~ExponentialDisplacementFieldImageFilter_LSD()
   {
   };
 
@@ -156,7 +156,7 @@ protected:
   typedef typename FieldInterpolatorType::OutputType FieldInterpolatorOutputType;
   typedef typename AdderType::Pointer                AdderPointer;
 private:
-  ExponentialDeformationFieldImageFilter(const Self &); // purposely not implemented
+  ExponentialDisplacementFieldImageFilter_LSD(const Self &); // purposely not implemented
   void operator=(const Self &);                         // purposely not implemented
 
   bool         m_AutomaticNumberOfIterations;
@@ -174,7 +174,7 @@ private:
 } // end namespace itk
 
 #ifndef ITK_MANUAL_INSTANTIATION
-#include "itkExponentialDeformationFieldImageFilter2.hxx"
+#include "itkExponentialDisplacementFieldImageFilter_LSD.hxx"
 #endif
 
 #endif

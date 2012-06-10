@@ -1,7 +1,7 @@
-#ifndef __itkExponentialDeformationFieldImageFilter2_txx
-#define __itkExponentialDeformationFieldImageFilter2_txx
+#ifndef __itkExponentialDisplacementFieldImageFilter_LSD2_txx
+#define __itkExponentialDisplacementFieldImageFilter_LSD2_txx
 
-#include "itkExponentialDeformationFieldImageFilter2.h"
+#include "itkExponentialDisplacementFieldImageFilter_LSD.h"
 #include "itkProgressReporter.h"
 #include "itkImageRegionConstIterator.h"
 
@@ -12,8 +12,8 @@ namespace itk
  * Initialize new instance
  */
 template <class TInputImage, class TOutputImage>
-ExponentialDeformationFieldImageFilter<TInputImage, TOutputImage>
-::ExponentialDeformationFieldImageFilter()
+ExponentialDisplacementFieldImageFilter_LSD<TInputImage, TOutputImage>
+::ExponentialDisplacementFieldImageFilter_LSD()
 {
   m_AutomaticNumberOfIterations = true;
   m_MaximumNumberOfIterations = 20;
@@ -38,7 +38,7 @@ ExponentialDeformationFieldImageFilter<TInputImage, TOutputImage>
  */
 template <class TInputImage, class TOutputImage>
 void
-ExponentialDeformationFieldImageFilter<TInputImage, TOutputImage>
+ExponentialDisplacementFieldImageFilter_LSD<TInputImage, TOutputImage>
 ::PrintSelf(std::ostream& os, Indent indent) const
 {
   Superclass::PrintSelf(os, indent);
@@ -58,7 +58,7 @@ ExponentialDeformationFieldImageFilter<TInputImage, TOutputImage>
  */
 template <class TInputImage, class TOutputImage>
 void
-ExponentialDeformationFieldImageFilter<TInputImage, TOutputImage>
+ExponentialDisplacementFieldImageFilter_LSD<TInputImage, TOutputImage>
 ::GenerateData()
 {
   itkDebugMacro(<< "Actually executing");

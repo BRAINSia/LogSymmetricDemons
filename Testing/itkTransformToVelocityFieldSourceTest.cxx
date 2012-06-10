@@ -5,7 +5,7 @@
 #include <iostream>
 
 #include "itkAffineTransform.h"
-#include "itkExponentialDeformationFieldImageFilter2.h"
+#include "itkExponentialDisplacementFieldImageFilter_LSD.h"
 #include "itkResampleImageFilter.h"
 #include "itkTransformToVelocityFieldSource.h"
 
@@ -39,7 +39,7 @@ int main(int, char * [] )
     VelocityFieldType,
     CoordRepresentationType>               VelocityFieldGeneratorType;
 
-  typedef itk::ExponentialDeformationFieldImageFilter<
+  typedef itk::ExponentialDisplacementFieldImageFilter_LSD<
     VelocityFieldType,
     DeformationFieldType>                  ExponentialFieldFilterType;
 

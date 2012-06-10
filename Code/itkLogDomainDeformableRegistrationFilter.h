@@ -2,7 +2,7 @@
 #define __itkLogDomainDeformableRegistrationFilter_h
 
 #include "itkDenseFiniteDifferenceImageFilter.h"
-#include "itkExponentialDeformationFieldImageFilter2.h"
+#include "itkExponentialDisplacementFieldImageFilter_LSD.h"
 #include "itkPDEDeformableRegistrationFunction.h"
 
 namespace itk
@@ -147,7 +147,7 @@ public:
   DeformationFieldPointer GetDeformationField();
 
   /** Get output inverse deformation field. */
-  DeformationFieldPointer GetInverseDeformationField();
+  DeformationFieldPointer GetInverseDisplacementField();
 
   /** Get the number of valid inputs.  For LogDomainDeformableRegistration,
    * this checks whether the fixed and moving images have been
@@ -231,7 +231,7 @@ protected:
   void PrintSelf(std::ostream& os, Indent indent) const;
 
   /** Exponential type */
-  typedef ExponentialDeformationFieldImageFilter<
+  typedef ExponentialDisplacementFieldImageFilter_LSD<
     VelocityFieldType, DeformationFieldType>      FieldExponentiatorType;
 
   typedef typename FieldExponentiatorType::Pointer FieldExponentiatorPointer;

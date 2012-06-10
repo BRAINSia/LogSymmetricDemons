@@ -594,9 +594,9 @@ template <class TFixedImage, class TMovingImage, class TField, class TRealType>
 typename MultiResolutionLogDomainDeformableRegistration<TFixedImage, TMovingImage, TField, TRealType>
 ::DeformationFieldPointer
 MultiResolutionLogDomainDeformableRegistration<TFixedImage, TMovingImage, TField, TRealType>
-::GetInverseDeformationField()
+::GetInverseDisplacementField()
 {
-  // std::cout<<"MultiResolutionLogDomainDeformableRegistration::GetInverseDeformationField"<<std::endl;
+  // std::cout<<"MultiResolutionLogDomainDeformableRegistration::GetInverseDisplacementField"<<std::endl;
   m_Exponentiator->SetInput( this->GetVelocityField() );
   m_Exponentiator->ComputeInverseOn();
   m_Exponentiator->Update();

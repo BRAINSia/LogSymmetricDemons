@@ -501,9 +501,9 @@ template <class TFixedImage, class TMovingImage, class TField>
 typename LogDomainDeformableRegistrationFilter<TFixedImage, TMovingImage, TField>
 ::DeformationFieldPointer
 LogDomainDeformableRegistrationFilter<TFixedImage, TMovingImage, TField>
-::GetInverseDeformationField()
+::GetInverseDisplacementField()
 {
-  // std::cout<<"LogDomainDeformableRegistration::GetInverseDeformationField"<<std::endl;
+  // std::cout<<"LogDomainDeformableRegistration::GetInverseDisplacementField"<<std::endl;
   m_InverseExponentiator->SetInput( this->GetVelocityField() );
   m_InverseExponentiator->GetOutput()->SetRequestedRegion( this->GetVelocityField()->GetRequestedRegion() );
   m_InverseExponentiator->Update();

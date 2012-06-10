@@ -9,7 +9,7 @@
 #include "itkImage.h"
 #include "itkImageRegionIteratorWithIndex.h"
 #include "itkVectorCastImageFilter.h"
-#include "itkExponentialDeformationFieldImageFilter2.h"
+#include "itkExponentialDisplacementFieldImageFilter_LSD.h"
 #include "itkDisplacementFieldCompositionFilter.h"
 #include "itkSmoothingRecursiveGaussianImageFilter.h"
 #include "itkVelocityFieldBCHCompositionFilter.h"
@@ -180,7 +180,7 @@ int main(int, char * [] )
   std::cout << "1) Compute the exponential of those velocity fields." << std::endl;
 
   // Exponential calculator filter type
-  typedef itk::ExponentialDeformationFieldImageFilter<
+  typedef itk::ExponentialDisplacementFieldImageFilter_LSD<
     FieldType, FieldType>   ExponentiatorType;
 
   ExponentiatorType::Pointer exponentiator = ExponentiatorType::New();

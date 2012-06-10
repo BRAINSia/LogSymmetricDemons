@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   Insight Segmentation & Registration Toolkit
-  Module:    $RCSfile: itkExponentialDeformationFieldImageFilterTest.cxx,v $
+  Module:    $RCSfile: itkExponentialDisplacementFieldImageFilter_LSDTest.cxx,v $
   Language:  C++
   Date:      $Date: 2008-09-30 14:04:52 $
   Version:   $Revision: 1.2 $
@@ -20,7 +20,7 @@
 
 #include "itkImage.h"
 #include "itkVector.h"
-#include "itkExponentialDeformationFieldImageFilter2.h"
+#include "itkExponentialDisplacementFieldImageFilter_LSD.h"
 
 #include "vnl/vnl_random.h"
 
@@ -86,7 +86,7 @@ int main(int, char * [] )
     }
 
   // Declare the type for the filter
-  typedef itk::ExponentialDeformationFieldImageFilter<
+  typedef itk::ExponentialDisplacementFieldImageFilter_LSD<
     ImageType, ImageType>   FilterType;
 
   // Create one filter

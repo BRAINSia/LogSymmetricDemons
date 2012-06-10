@@ -127,9 +127,9 @@ SymmetricLogDomainDemonsRegistrationFilter<TFixedImage, TMovingImage, TField>
   b->SetFixedImage( this->GetMovingImage() );
   b->SetMovingImage( this->GetFixedImage() );
 #if (ITK_VERSION_MAJOR < 4)
-  b->SetDeformationField( this->GetInverseDeformationField() );
+  b->SetDeformationField( this->GetInverseDisplacementField() );
 #else
-  b->SetDisplacementField( this->GetInverseDeformationField() );
+  b->SetDisplacementField( this->GetInverseDisplacementField() );
 #endif
   b->InitializeIteration();
 

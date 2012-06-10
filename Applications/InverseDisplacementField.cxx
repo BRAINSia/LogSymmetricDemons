@@ -3,7 +3,7 @@
 #include "itkImageFileReader.h"
 #include "itkImageFileWriter.h"
 #include "itkDisplacementToVelocityFieldLogFilter.h"
-#include "itkExponentialDeformationFieldImageFilter2.h"
+#include "itkExponentialDisplacementFieldImageFilter_LSD.h"
 #include "itkDisplacementFieldCompositionFilter.h"
 #include "itkImageRegionIterator.h"
 #include "itkImageRegionConstIterator.h"
@@ -28,7 +28,7 @@ public:
   typedef itk::DisplacementToVelocityFieldLogFilter<DeformationFieldType, VelocityFieldType>
   VelocitorFilterType;
 
-  typedef itk::ExponentialDeformationFieldImageFilter<VelocityFieldType, DeformationFieldType>
+  typedef itk::ExponentialDisplacementFieldImageFilter_LSD<VelocityFieldType, DeformationFieldType>
   ExponentiatorFilterType;
 
   itkNewMacro(Self);
@@ -121,7 +121,7 @@ int main(int argc, char *argv[])
     typedef itk::ImageFileReader<ImageType>                                   ReaderType;
     typedef itk::ImageFileWriter<ImageType>                                   WriterType;
     typedef itk::DisplacementToVelocityFieldLogFilter<ImageType, ImageType>   VelocitorFilterType;
-    typedef itk::ExponentialDeformationFieldImageFilter<ImageType, ImageType> ExponentiatorFilterType;
+    typedef itk::ExponentialDisplacementFieldImageFilter_LSD<ImageType, ImageType> ExponentiatorFilterType;
     typedef itk::DisplacementFieldCompositionFilter<ImageType, ImageType>     CompositionFilterType;
 
     std::cout << "Reading...";
