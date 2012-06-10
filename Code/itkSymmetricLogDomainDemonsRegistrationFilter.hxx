@@ -450,7 +450,11 @@ SymmetricLogDomainDemonsRegistrationFilter<TFixedImage, TMovingImage, TField>
 template <class TFixedImage, class TMovingImage, class TField>
 void
 SymmetricLogDomainDemonsRegistrationFilter<TFixedImage, TMovingImage, TField>
+#if (ITK_VERSION_MAJOR < 4)
 ::ApplyUpdate(TimeStepType dt)
+#else
+::ApplyUpdate(const TimeStepType& dt)
+#endif
 {
   const DemonsRegistrationFunctionType *drfpf = this->GetForwardRegistrationFunctionType();
   const DemonsRegistrationFunctionType *drfpb = this->GetBackwardRegistrationFunctionType();

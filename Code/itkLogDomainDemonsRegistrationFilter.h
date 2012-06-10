@@ -145,7 +145,11 @@ protected:
   virtual void InitializeIteration();
 
   /** Apply update. */
+#if (ITK_VERSION_MAJOR < 4)
   virtual void ApplyUpdate(TimeStepType dt);
+#else
+  virtual void ApplyUpdate(const TimeStepType& dt);
+#endif
 
 private:
   LogDomainDemonsRegistrationFilter(const Self &); // purposely not implemented

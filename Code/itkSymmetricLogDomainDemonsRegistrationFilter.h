@@ -162,7 +162,11 @@ protected:
   virtual TimeStepType ThreadedCalculateChange(const ThreadRegionType & regionToProcess, int threadId);
 
   /** Apply update. */
+#if (ITK_VERSION_MAJOR < 4)
   virtual void ApplyUpdate(TimeStepType dt);
+#else
+  virtual void ApplyUpdate(const TimeStepType& dt);
+#endif
 
   /** This method returns a pointer to a FiniteDifferenceFunction object that
    * will be used by the filter to calculate updates at image pixels.

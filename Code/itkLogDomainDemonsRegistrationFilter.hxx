@@ -178,7 +178,11 @@ LogDomainDemonsRegistrationFilter<TFixedImage, TMovingImage, TField>
 template <class TFixedImage, class TMovingImage, class TField>
 void
 LogDomainDemonsRegistrationFilter<TFixedImage, TMovingImage, TField>
+#if (ITK_VERSION_MAJOR < 4)
 ::ApplyUpdate(TimeStepType dt)
+#else
+::ApplyUpdate(const TimeStepType& dt)
+#endif
 {
   // std::cout<<"LogDomainDemonsRegistrationFilter::ApplyUpdate"<<std::endl;
   // If we smooth the update buffer before applying it, then the are

@@ -254,6 +254,23 @@ protected:
    * If the input does not exist, a zero field is written to the output. */
   virtual void CopyInputToOutput();
 
+#if (ITK_VERSION_MAJOR < 4)
+  virtual void ApplyUpdate(TimeStepType dt)
+    {
+    //By default just use the superclass.
+    Superclass::ApplyUpdate(dt);
+    };
+#else
+  /** This method applies changes from the m_UpdateBuffer to the output using
+   *    * the ThreadedApplyUpdate() method and a multithreading mechanism.  "dt" is
+   *       * the time step to use for the update of each pixel. */
+  virtual void ApplyUpdate(const TimeStepType& dt)
+    {
+    //By default just use the superclass.
+    Superclass::ApplyUpdate(dt);
+    };
+#endif
+
   /** Initialize the state of filter and equation before each iteration.
    * Progress feeback is implemented as part of this method. */
   virtual void InitializeIteration();
