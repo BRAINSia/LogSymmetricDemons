@@ -173,12 +173,12 @@ do
 	    ctest -j ${NPROCS} -D Nightly
             if [ "$coverage" = "1" ] ; then
                 ctest -D NightlyCoverage
-            else
+            fi
         else
             ctest -j ${NPROCS} -D Experimental
             if [ "$coverage" = "1" ] ; then
                 ctest -D ExperimentalCoverage
-            else
+            fi
         fi
     else
         if [[ $scriptname =~ '.*nightly.sh' ]] ; then
