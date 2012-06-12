@@ -15,8 +15,14 @@ template <class TFixedImage, class TMovingImage, class TField, class TRealType>
 MultiResolutionLogDomainDeformableRegistration<TFixedImage, TMovingImage, TField, TRealType>
 ::MultiResolutionLogDomainDeformableRegistration()
 {
-
+#if (ITK_VERSION_MAJOR < 4)
   this->SetNumberOfRequiredInputs(2);
+#else
+  //HACK:  This really should define the names of the required inputs.
+  this->SetNumberOfIndexedInputs(2);
+  // Primary input is optional in this filter
+  this->RemoveRequiredInputName( "Primary" );
+#endif
 
   typename DefaultRegistrationType::Pointer registrator =
     DefaultRegistrationType::New();
@@ -69,9 +75,9 @@ MultiResolutionLogDomainDeformableRegistration<TFixedImage, TMovingImage, TField
   const MovingImageType * ptr )
 {
 #if (ITK_VERSION_MAJOR < 4)
-  this->ProcessObject::SetNthInput( 2, const_cast<MovingImageType *>( ptr ) );
+  this->ProcessObject::SetNthInput( MOVING_IMAGE_CODE, const_cast<MovingImageType *>( ptr ) );
 #else
-  this->ProcessObject::SetNthInput( 1, const_cast<MovingImageType *>( ptr ) );
+  this->ProcessObject::SetNthInput( MOVING_IMAGE_CODE, const_cast<MovingImageType *>( ptr ) );
 #endif
 }
 
@@ -84,9 +90,9 @@ const typename MultiResolutionLogDomainDeformableRegistration<TFixedImage, TMovi
   {
   return dynamic_cast<const MovingImageType *>
 #if (ITK_VERSION_MAJOR < 4)
-         ( this->ProcessObject::GetInput( 2 ) );
+         ( this->ProcessObject::GetInput( MOVING_IMAGE_CODE ) );
 #else
-         ( this->ProcessObject::GetInput( 1 ) );
+         ( this->ProcessObject::GetInput( MOVING_IMAGE_CODE ) );
 #endif
   }
 
@@ -98,9 +104,9 @@ MultiResolutionLogDomainDeformableRegistration<TFixedImage, TMovingImage, TField
   const FixedImageType * ptr )
 {
 #if (ITK_VERSION_MAJOR < 4)
-  this->ProcessObject::SetNthInput( 1, const_cast<FixedImageType *>( ptr ) );
+  this->ProcessObject::SetNthInput( FIXED_IMAGE_CODE, const_cast<FixedImageType *>( ptr ) );
 #else
-  this->ProcessObject::SetNthInput( 0, const_cast<FixedImageType *>( ptr ) );
+  this->ProcessObject::SetNthInput( FIXED_IMAGE_CODE, const_cast<FixedImageType *>( ptr ) );
 #endif
 }
 
@@ -113,9 +119,9 @@ const typename MultiResolutionLogDomainDeformableRegistration<TFixedImage, TMovi
   {
   return dynamic_cast<const FixedImageType *>
 #if (ITK_VERSION_MAJOR < 4)
-         ( this->ProcessObject::GetInput( 1 ) );
+         ( this->ProcessObject::GetInput( FIXED_IMAGE_CODE ) );
 #else
-         ( this->ProcessObject::GetInput( 0 ) );
+         ( this->ProcessObject::GetInput( FIXED_IMAGE_CODE ) );
 #endif
   }
 
@@ -236,9 +242,9 @@ MultiResolutionLogDomainDeformableRegistration<TFixedImage, TMovingImage, TField
     }
 
 #if (ITK_VERSION_MAJOR < 4)
-  if( this->m_InitialVelocityField && this->GetInput(0) )
+  if( this->m_InitialVelocityField && this->GetInput(VELOCITYFIELD_IMAGE_CODE) )
 #else
-  if( this->m_InitialVelocityField && this->GetInput(2) )
+  if( this->m_InitialVelocityField && this->GetInput(VELOCITYFIELD_IMAGE_CODE) )
 #endif
     {
     itkExceptionMacro( << "Only one initial velocity can be given. "
@@ -268,9 +274,9 @@ MultiResolutionLogDomainDeformableRegistration<TFixedImage, TMovingImage, TField
 
   VelocityFieldPointer inputPtr =
 #if (ITK_VERSION_MAJOR < 4)
-    const_cast<VelocityFieldType *>( this->GetInput(0) );
+    const_cast<VelocityFieldType *>( this->GetInput(VELOCITYFIELD_IMAGE_CODE) );
 #else
-    const_cast<VelocityFieldType *>( this->GetInput(2) );
+    const_cast<VelocityFieldType *>( this->GetInput(VELOCITYFIELD_IMAGE_CODE) );
 #endif
   if( this->m_InitialVelocityField )
     {
@@ -486,9 +492,9 @@ MultiResolutionLogDomainDeformableRegistration<TFixedImage, TMovingImage, TField
   typename DataObject::Pointer output;
 
 #if (ITK_VERSION_MAJOR < 4)
-  if( this->GetInput(0) )
+  if( this->GetInput(VELOCITYFIELD_IMAGE_CODE) )
 #else
-  if( this->GetInput(2) )
+  if( this->GetInput(VELOCITYFIELD_IMAGE_CODE) )
 #endif
     {
     // Initial velocity field is set.
@@ -535,9 +541,9 @@ MultiResolutionLogDomainDeformableRegistration<TFixedImage, TMovingImage, TField
   // the fixed image and initial velocity field.
   VelocityFieldPointer inputPtr =
 #if (ITK_VERSION_MAJOR < 4)
-    const_cast<VelocityFieldType *>( this->GetInput() );
+    const_cast<VelocityFieldType *>( this->GetInput(VELOCITYFIELD_IMAGE_CODE) );
 #else
-    const_cast<VelocityFieldType *>( this->GetInput(2) );
+    const_cast<VelocityFieldType *>( this->GetInput(VELOCITYFIELD_IMAGE_CODE) );
 #endif
   VelocityFieldPointer outputPtr = this->GetOutput();
   FixedImagePointer    fixedPtr =
