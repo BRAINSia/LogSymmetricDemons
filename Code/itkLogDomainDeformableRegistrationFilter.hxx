@@ -21,8 +21,14 @@ template <class TFixedImage, class TMovingImage, class TField>
 LogDomainDeformableRegistrationFilter<TFixedImage, TMovingImage, TField>
 ::LogDomainDeformableRegistrationFilter()
 {
-
+#if (ITK_VERSION_MAJOR < 4)
   this->SetNumberOfRequiredInputs(2);
+#else
+  //HACK:  This really should define the names of the required inputs.
+  this->SetNumberOfIndexedInputs(2);
+  // Primary input is optional in this filter
+  this->RemoveRequiredInputName( "Primary" );
+#endif
 
   this->SetNumberOfIterations(10);
 
@@ -55,7 +61,7 @@ LogDomainDeformableRegistrationFilter<TFixedImage, TMovingImage, TField>
 ::SetInitialVelocityField( VelocityFieldType * ptr )
 {
 #if (ITK_VERSION_MAJOR < 4)
-  this->SetInput( ptr );
+  this->SetNthInput( VELOCITYFIELD_IMAGE_CODE, ptr );
 #else
   this->SetNthInput( VELOCITYFIELD_IMAGE_CODE, ptr );
 #endif

@@ -291,8 +291,10 @@ int main(int, char * [] )
     }
   catch( itk::ExceptionObject & err )
     {
-    std::cout << "Caught expected error." << std::endl;
     std::cout << err << std::endl;
+    std::cout << "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^" << std::endl;
+    std::cout << "Excpected exception properly handled by ignoring the above error." << std::endl;
+    std::cout << "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^" << std::endl;
     }
 
   if( !testPassed )
@@ -315,8 +317,10 @@ int main(int, char * [] )
     }
   catch( itk::ExceptionObject & err )
     {
-    std::cout << "Caught expected error." << std::endl;
     std::cout << err << std::endl;
+    std::cout << "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^" << std::endl;
+    std::cout << "Excpected exception properly handled by ignoring the above error." << std::endl;
+    std::cout << "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^" << std::endl;
     }
 
   if( !testPassed )

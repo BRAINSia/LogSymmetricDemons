@@ -162,9 +162,9 @@ public:
   virtual void SetArbitraryInitialVelocityField( VelocityFieldType * ptr )
   {
 #if (ITK_VERSION_MAJOR < 4)
-    this->SetInput( ptr );
+    this->SetNthInput(VELOCITYFIELD_IMAGE_CODE, ptr );
 #else
-    this->SetNthInput(2, ptr);
+    this->SetNthInput(VELOCITYFIELD_IMAGE_CODE, ptr);
 #endif
   }
 

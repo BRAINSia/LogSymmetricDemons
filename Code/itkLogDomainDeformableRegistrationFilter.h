@@ -5,15 +5,30 @@
 #include "itkExponentialDisplacementFieldImageFilter_LSD.h"
 #include "itkPDEDeformableRegistrationFunction.h"
 
-namespace itk
-{
 
   //HACK:  These global code should be converted to string and then better incorporated.
+#if (ITK_VERSION_MAJOR < 4)
 typedef enum {
   VELOCITYFIELD_IMAGE_CODE=0,
   FIXED_IMAGE_CODE=1,
   MOVING_IMAGE_CODE=2
 } INPUT_CODES;
+#else
+#if 0
+ static const std::string VELOCITYFIELD_IMAGE_CODE("Primary");
+ static const std::string FIXED_IMAGE_CODE("FixedImageCode");
+ static const std::string MOVING_IMAGE_CODE("MovingImageCode");
+#else
+typedef enum {
+  VELOCITYFIELD_IMAGE_CODE=0,
+  FIXED_IMAGE_CODE=1,
+  MOVING_IMAGE_CODE=2,
+} INPUT_CODES;
+#endif
+#endif
+
+namespace itk
+{
 
 /**
  * \class LogDomainDeformableRegistrationFilter

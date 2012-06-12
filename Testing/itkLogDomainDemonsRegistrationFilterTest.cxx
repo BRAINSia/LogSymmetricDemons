@@ -94,9 +94,9 @@ public:
       }
     else
       {
-      const std::string thisIterName=std::string("TVField_")+convertInt(VFcounter)+std::string(".nii.gz");
+      //const std::string thisIterName=std::string("TVField_")+convertInt(VFcounter)+std::string(".nii.gz");
       //std::cout << VelField << std::endl;
-      WriteConstImage<FieldType>( VelField.GetPointer(), thisIterName );
+      //WriteConstImage<FieldType>( VelField.GetPointer(), thisIterName );
       }
     VFcounter++;
   }
@@ -380,7 +380,6 @@ int main(int argc, char * argv[] )
       }
 
     registrator->Print( std::cout );
-#if 1 //HACK Removing to see if this section is the one that causes failure
     // -----------------------------------------------------------
 
     std::cout << "Test running registrator without initial deformation field.";
@@ -441,10 +440,11 @@ int main(int argc, char * argv[] )
       }
     catch( itk::ExceptionObject & err )
       {
-      std::cout << "Caught expected error." << std::endl;
       std::cout << err << std::endl;
+      std::cout << "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^" << std::endl;
+      std::cout << "Excpected exception properly handled by ignoring the above error." << std::endl;
+      std::cout << "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^" << std::endl;
       }
-#endif
     if( !testPassed )
       {
       std::cout << "Test failed" << std::endl;
