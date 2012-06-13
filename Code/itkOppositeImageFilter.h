@@ -49,12 +49,12 @@ public:
   ~Opposite()
   {
   };
-  bool operator!=( const Opposite & other ) const
+  bool operator!=( const Opposite & /* other */ ) const
   {
     return false;
   }
 
-  bool operator==( const Opposite & other ) const
+  bool operator==( const Opposite & /* other */) const
   {
     return true;
   }

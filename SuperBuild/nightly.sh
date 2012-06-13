@@ -4,7 +4,7 @@
 # libraries are found and used
 # ahead of system libs
 package=LogSymmetricDemons
-giturl=https://github.com/BRAINSia/LogSymmetricDemons.git
+giturl=git@github.com:Chaircrusher/LogSymmetricDemons.git
 buildtop=/SuperBuild
 #
 # when run by cron, the path variable is only /bin:/usr/bin
@@ -129,7 +129,7 @@ fi
 
 for BUILD_TYPE in Debug Release
 do
-    BuildDir=${top}/${BUILD_TYPE}-${Compiler}
+    BuildDir=${top}/${package}-${BUILD_TYPE}-${Compiler}
     if [ "$BUILD_TYPE" = "Debug" -a "$coverage" = "1" ] ; then
 	CXXFLAGS="${CXXFLAGS} -g -O0 -Wall -W -Wshadow -Wunused-variable \
 	    -Wunused-parameter -Wunused-function -Wunused -Wno-system-headers \
@@ -168,25 +168,23 @@ do
     make -j ${NPROCS}
     cd ${package}-build
     make clean
-    if [ "$doValGrind" != "1" ] ; then
+    if [ "$doValgrind" != "1" ] ; then
         if [[ $scriptname =~ '.*nightly.sh' ]] ; then
+	    ctest -j ${NPROCS} -D Nightly
             if [ "$coverage" = "1" ] ; then
                 ctest -D NightlyCoverage
-            else
-	        ctest -j ${NPROCS} -D Nightly
             fi
         else
+            ctest -j ${NPROCS} -D Experimental
             if [ "$coverage" = "1" ] ; then
                 ctest -D ExperimentalCoverage
-            else
-                ctest -j ${NPROCS} -D Experimental
             fi
         fi
     else
         if [[ $scriptname =~ '.*nightly.sh' ]] ; then
-	    ctest -j ${NPROCS} -D NightlyMemoryCheck
+	    ctest -j ${NPROCS} -D NightlyMemCheck
         else
-	    ctest -j ${NPROCS} -D ExperimentalMemoryCheck
+	    ctest -j ${NPROCS} -D ExperimentalMemCheck
         fi
     fi
     cd ..
