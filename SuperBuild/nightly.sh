@@ -168,7 +168,7 @@ do
     make -j ${NPROCS}
     cd ${package}-build
     make clean
-    if [ "$doValGrind" != "1" ] ; then
+    if [ "$doValgrind" != "1" ] ; then
         if [[ $scriptname =~ '.*nightly.sh' ]] ; then
 	    ctest -j ${NPROCS} -D Nightly
             if [ "$coverage" = "1" ] ; then
@@ -182,9 +182,9 @@ do
         fi
     else
         if [[ $scriptname =~ '.*nightly.sh' ]] ; then
-	    ctest -j ${NPROCS} -D NightlyMemoryCheck
+	    ctest -j ${NPROCS} -D NightlyMemCheck
         else
-	    ctest -j ${NPROCS} -D ExperimentalMemoryCheck
+	    ctest -j ${NPROCS} -D ExperimentalMemCheck
         fi
     fi
     cd ..
