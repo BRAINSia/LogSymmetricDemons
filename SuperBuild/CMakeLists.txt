@@ -36,3 +36,15 @@ ExternalProject_add(LogSymmetricDemons
   -DITK_DIR:PATH=${ITK_DIR}
   DEPENDS ITKv4
 )
+set(stampDir ${CMAKE_CURRENT_BUILD_DIR}/LogSymmetricDemons-prefix/src/LogSymmetricDemons-stamp)
+set(stampFiles
+#  ${stampDir}/LogSymmetricDemons-configure
+  ${stampDir}/LogSymmetricDemons-build
+)
+
+ExternalProject_Add_Step(LogSymmetricDemons forcebuild
+    COMMAND ${CMAKE_COMMAND} -E remove ${stampFiles}
+    DEPENDEES configure
+    DEPENDERS build
+    ALWAYS 1
+  )

@@ -37,6 +37,9 @@ CFLAGS="${CFLAGS:-}"
 LDFLAGS="${LDFLAGS:-}"
 CCOverride=""
 CXXOverride=""
+coverage=""
+valgrind=""
+experimental=""
 
 while [ $# -gt 0 ]
 do
@@ -46,6 +49,8 @@ do
             coverage=1 ;;
         valgrind)
             doValgrind=1 ;;
+        [Ee]xperimental)
+            experimental=1 ;;
         CC=*)
           echo Override C Compiler ; CCOverride=`echo $1 | sed -e 's/^CC=//'` ;;
         CXX=*)
@@ -168,8 +173,8 @@ do
     make -j ${NPROCS}
     cd ${package}-build
     make clean
-    if [ "$doValgrind" != "1" ] ; then
-        if [[ $scriptname =~ '.*nightly.sh' ]] ; then
+    if [ "$doValGrind" != "1" -o "$BUILD_TYPE}" = "Release" ] ; then
+        if [[ $scriptname =~ '.*nightly.sh' ]] && [[ "${experimental}" != "1" ]] ; then
 	    ctest -j ${NPROCS} -D Nightly
             if [ "$coverage" = "1" ] ; then
                 ctest -D NightlyCoverage
@@ -180,11 +185,11 @@ do
                 ctest -D ExperimentalCoverage
             fi
         fi
-    else
-        if [[ $scriptname =~ '.*nightly.sh' ]] ; then
-	    ctest -j ${NPROCS} -D NightlyMemCheck
+    else # VALGRIND BUILD
+        if [[ $scriptname =~ '.*nightly.sh' ]] && [[ "${experimental}" != "1" ]] ; then
+	    ctest -j ${NPROCS} -D NightlyMemoryCheck
         else
-	    ctest -j ${NPROCS} -D ExperimentalMemCheck
+	    ctest -j ${NPROCS} -D ExperimentalMemoryCheck
         fi
     fi
     cd ..
