@@ -225,7 +225,9 @@ LogDomainDemonsRegistrationFilter<TFixedImage, TMovingImage, TField>
 
   // Region passing stuff
   this->GraftOutput( m_BCHFilter->GetOutput() );
+#if 0
   this->m_TempVelocityField = this->GetVelocityField();
+#endif
 
   // Smooth the velocity field
   if( this->GetSmoothVelocityField() )

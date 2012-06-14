@@ -38,7 +38,10 @@ WriteConstImage(const typename ImageType::ConstPointer image,
     }
   std::cout << "WROTE IMAGE: " << filename << std::endl;
 }
+
+#if 0
 static unsigned int VFcounter=0;
+#endif
 
 std::string convertInt(const unsigned int number)
 {
@@ -87,6 +90,7 @@ public:
     const unsigned int ImageDimension = 2;
     typedef itk::Vector<float, ImageDimension>     VectorType;
     typedef itk::Image<VectorType, ImageDimension> FieldType;
+#if 0
     typename FieldType::Pointer VelField= this->m_Process->GetTempVelocityField();
     if(VelField.IsNull())
       {
@@ -99,6 +103,7 @@ public:
       //WriteConstImage<FieldType>( VelField.GetPointer(), thisIterName );
       }
     VFcounter++;
+#endif
   }
 
   typename TRegistration::Pointer m_Process;
@@ -196,8 +201,6 @@ int main(int /* argc */, char * /* argv */[] )
       {
       itk::Point<double, ImageDimension> center_pt_fixed;
         {
-        // HACK: center_pt_fixed[0] = 62;
-        // center_pt_fixed[0] = 50;
         center_pt_fixed[0] = 62;
         center_pt_fixed[1] = 64;
         }
@@ -265,23 +268,14 @@ int main(int /* argc */, char * /* argv */[] )
       initField->FillBuffer( zeroVec );
       }
 
-#if 0 //HACK
-    typedef itk::VectorCastImageFilter<FieldType, FieldType> CasterType;
-    CasterType::Pointer caster = CasterType::New();
-    caster->SetInput( initField );
-    caster->InPlaceOff();
-#endif
-
     // -------------------------------------------------------------
     // -------------------------------------------------------------
-
     std::cout << "Run registration and warp moving" << std::endl;
 
     typedef itk::LogDomainDemonsRegistrationFilter<ImageType, ImageType, FieldType> RegistrationType;
     RegistrationType::Pointer registrator = RegistrationType::New();
 
     registrator->SetInitialVelocityField( initField );
-    // HACK registrator->SetInitialVelocityField( caster->GetOutput() );
     registrator->SetMovingImage( moving );
     registrator->SetFixedImage( fixed );
     registrator->SetNumberOfIterations( 200 );
@@ -293,8 +287,7 @@ int main(int /* argc */, char * /* argv */[] )
     registrator->SetNumberOfBCHApproximationTerms( 2 );
 
     // Turn on inplace execution
-    //HACK registrator->InPlaceOn();
-    registrator->InPlaceOff();
+    registrator->InPlaceOn();
 
     typedef RegistrationType::DemonsRegistrationFunctionType LDDRFunctionType;
     LDDRFunctionType::Pointer fptr = dynamic_cast<LDDRFunctionType *>( registrator->GetDifferenceFunction().GetPointer() );
@@ -409,7 +402,6 @@ int main(int /* argc */, char * /* argv */[] )
     std::cout << "Test NULL moving image. " << std::endl;
     try
       {
-      // HACK registrator->SetInput( caster->GetOutput() );
       registrator->SetInput( initField );
       registrator->SetMovingImage( NULL );
       registrator->Update();

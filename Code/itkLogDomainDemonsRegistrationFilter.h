@@ -128,8 +128,10 @@ public:
   virtual void SetNumberOfBCHApproximationTerms(unsigned int);
   virtual unsigned int GetNumberOfBCHApproximationTerms() const;
 
+#if defined(USE_DEBUG_TEMP_VELOCITY)
   itkSetObjectMacro(TempVelocityField,VelocityFieldType);
   itkGetObjectMacro(TempVelocityField,VelocityFieldType);
+#endif
 
 protected:
   LogDomainDemonsRegistrationFilter();
@@ -175,8 +177,9 @@ private:
 
   MultiplyByConstantPointer  m_Multiplier;
   BCHFilterPointer           m_BCHFilter;
-  //HACK
+#if defined(USE_DEBUG_TEMP_VELOCITY)
   typename VelocityFieldType::Pointer m_TempVelocityField;
+#endif
 
 };
 

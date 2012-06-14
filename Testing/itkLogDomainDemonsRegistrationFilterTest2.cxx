@@ -206,6 +206,7 @@ int main(int, char * [] )
       radius / moving_spacing[0], fgnd, bgnd );
 
     WriteConstImage<ImageType>(moving.GetPointer(), "moving.mha");
+#if 0
     // -------------------------------------------------------------
     // -------------------------------------------------------------
     //HACK TEST
@@ -227,6 +228,7 @@ int main(int, char * [] )
     CasterType::Pointer caster = CasterType::New();
     caster->SetInput( initField );
     caster->InPlaceOff();
+#endif
 
     // -------------------------------------------------------------
     // -------------------------------------------------------------
@@ -236,8 +238,10 @@ int main(int, char * [] )
     typedef itk::LogDomainDemonsRegistrationFilter<ImageType, ImageType, FieldType> RegistrationType;
     RegistrationType::Pointer registrator = RegistrationType::New();
 
+#if 0
     //HACK TEST Explicitly set InitialVelocityField to zeros!
-    registrator->SetInitialVelocityField( caster->GetOutput() );
+    registrator->SetInitialVelocityField( initField );
+#endif
     registrator->SetMovingImage( moving );
     registrator->SetFixedImage( fixed );
     registrator->SetNumberOfIterations( 100 );
@@ -249,8 +253,7 @@ int main(int, char * [] )
     registrator->SetNumberOfBCHApproximationTerms( 2 );
 
     // Turn on inplace execution
-    // registrator->InPlaceOn();
-    registrator->InPlaceOff();
+    registrator->InPlaceOn();
 
     typedef RegistrationType::DemonsRegistrationFunctionType FunctionType;
     FunctionType * fptr = dynamic_cast<FunctionType *>( registrator->GetDifferenceFunction().GetPointer() );

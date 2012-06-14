@@ -15,9 +15,14 @@ typedef enum {
 } INPUT_CODES;
 #else
 #if 0
- static const std::string VELOCITYFIELD_IMAGE_CODE("Primary");
- static const std::string FIXED_IMAGE_CODE("FixedImageCode");
- static const std::string MOVING_IMAGE_CODE("MovingImageCode");
+ // TODO: Figure out how to use named inputs.
+ //
+ const char VELOCITYFIELD_IMAGE_CODE[]="Primary";
+ const char FIXED_IMAGE_CODE[]="FixedImageCode";
+ const char MOVING_IMAGE_CODE[]="MovingImageCode";
+ //static const std::string VELOCITYFIELD_IMAGE_CODE("Primary");
+ //static const std::string FIXED_IMAGE_CODE("FixedImageCode");
+ //static const std::string MOVING_IMAGE_CODE("MovingImageCode");
 #else
 typedef enum {
   VELOCITYFIELD_IMAGE_CODE=0,

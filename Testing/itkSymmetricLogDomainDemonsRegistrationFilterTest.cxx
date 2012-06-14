@@ -138,10 +138,12 @@ int main(int, char * [] )
   zeroVec.Fill( 0.0 );
   initField->FillBuffer( zeroVec );
 
+#if 0
   typedef itk::VectorCastImageFilter<FieldType, FieldType> CasterType;
   CasterType::Pointer caster = CasterType::New();
   caster->SetInput( initField );
-  caster->InPlaceOff();
+  caster->InPlaceOn();
+#endif
 
   // -------------------------------------------------------------
 
@@ -150,7 +152,7 @@ int main(int, char * [] )
   typedef itk::SymmetricLogDomainDemonsRegistrationFilter<ImageType, ImageType, FieldType> RegistrationType;
   RegistrationType::Pointer registrator = RegistrationType::New();
 
-  registrator->SetInitialVelocityField( caster->GetOutput() );
+  registrator->SetInitialVelocityField( initField );
   registrator->SetMovingImage( moving );
   registrator->SetFixedImage( fixed );
   registrator->SetNumberOfIterations( 200 );
@@ -285,7 +287,7 @@ int main(int, char * [] )
 
   try
     {
-    registrator->SetInput( caster->GetOutput() );
+    registrator->SetInput( initField );
     registrator->SetMovingImage( NULL );
     registrator->Update();
     }

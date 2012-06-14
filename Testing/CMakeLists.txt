@@ -11,7 +11,7 @@ SD_UNIT_TEST(itkSymmetricLogDomainDemonsRegistrationFilterTest2.cxx EXTLIBS ${Li
 SD_UNIT_TEST(itkTransformToVelocityFieldSourceTest.cxx EXTLIBS ${Libraries})
 SD_UNIT_TEST(itkDisplacementToVelocityFieldLogFilterTest.cxx EXTLIBS ${Libraries})
 
-set_test_properties( itkLogDomainDemonsRegistrationFilterTest
+set_tests_properties( itkLogDomainDemonsRegistrationFilterTest
   itkLogDomainDemonsRegistrationFilterTest2
   PROPERTIES TIMEOUT 6000 )
 
