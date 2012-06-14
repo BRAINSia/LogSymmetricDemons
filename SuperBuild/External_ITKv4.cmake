@@ -58,8 +58,8 @@ if(NOT ${extProjName}_DIR AND NOT USE_SYSTEM_${extProjName})
     #  -DPYTHON_LIBRARY:FILEPATH=${${CMAKE_PROJECT_NAME}_PYTHON_LIBRARY}
     #  )
   #endif()
-  # HACK This code fixes a loony problem with HDF5 -- it doesn't
-  #      link properly if -fopenmp is used.
+  # This code fixes a loony problem with HDF5 -- it doesn't
+  # link properly if -fopenmp is used.
   string(REPLACE "-fopenmp" "" ITK_CMAKE_C_FLAGS "${CMAKE_C_FLAGS}")
   string(REPLACE "-fopenmp" "" ITK_CMAKE_CXX_FLAGS "${CMAKE_CX_FLAGS}")
 
@@ -67,9 +67,9 @@ if(NOT ${extProjName}_DIR AND NOT USE_SYSTEM_${extProjName})
       -DITK_LEGACY_REMOVE:BOOL=ON
       -DITK_BUILD_ALL_MODULES:BOOL=ON
       -DITK_USE_REVIEW:BOOL=ON
-      -DITKV3_COMPATIBILITY:BOOL=ON
+      -DITKV3_COMPATIBILITY:BOOL=OFF
       -DKWSYS_USE_MD5:BOOL=ON # Required by SlicerExecutionModel
-      -DUSE_WRAP_ITK:BOOL=OFF ## HACK:  QUICK CHANGE
+      -DUSE_WRAP_ITK:BOOL=OFF
     )
   ### --- End Project specific additions
   set(git_protocol git)

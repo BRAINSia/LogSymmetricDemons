@@ -6,31 +6,11 @@
 #include "itkPDEDeformableRegistrationFunction.h"
 
 
-  //HACK:  These global code should be converted to string and then better incorporated.
-#if (ITK_VERSION_MAJOR < 4)
 typedef enum {
   VELOCITYFIELD_IMAGE_CODE=0,
   FIXED_IMAGE_CODE=1,
   MOVING_IMAGE_CODE=2
-} INPUT_CODES;
-#else
-#if 0
- // TODO: Figure out how to use named inputs.
- //
- const char VELOCITYFIELD_IMAGE_CODE[]="Primary";
- const char FIXED_IMAGE_CODE[]="FixedImageCode";
- const char MOVING_IMAGE_CODE[]="MovingImageCode";
- //static const std::string VELOCITYFIELD_IMAGE_CODE("Primary");
- //static const std::string FIXED_IMAGE_CODE("FixedImageCode");
- //static const std::string MOVING_IMAGE_CODE("MovingImageCode");
-#else
-typedef enum {
-  VELOCITYFIELD_IMAGE_CODE=0,
-  FIXED_IMAGE_CODE=1,
-  MOVING_IMAGE_CODE=2,
-} INPUT_CODES;
-#endif
-#endif
+} INPUT_OUTPUT_FILTER_CODES;
 
 namespace itk
 {
@@ -159,7 +139,7 @@ public:
 
   /** Get output velocity field. */
   //HACK: const VelocityFieldType * GetVelocityField(void) const;
-  VelocityFieldType * GetVelocityField(void);
+  typename VelocityFieldType::Pointer GetVelocityField(void);
 
   /** Get output deformation field. */
   DeformationFieldPointer GetDeformationField();

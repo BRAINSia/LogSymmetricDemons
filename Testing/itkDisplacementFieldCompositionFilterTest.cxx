@@ -33,7 +33,6 @@ public:
 
 int main(int, char * [] )
 {
-  itk::MultiThreader::SetGlobalMaximumNumberOfThreads(1);
   const unsigned int ImageDimension = 2;
 
   typedef itk::Vector<float, ImageDimension>     VectorType;

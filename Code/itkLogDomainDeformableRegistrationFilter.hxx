@@ -98,12 +98,13 @@ LogDomainDeformableRegistrationFilter<TFixedImage, TMovingImage, TField>
 
 template <class TFixedImage, class TMovingImage, class TField>
 /*const HACK:  This should be const */
-typename LogDomainDeformableRegistrationFilter<TFixedImage, TMovingImage, TField>
-::VelocityFieldType *
+typename LogDomainDeformableRegistrationFilter<TFixedImage, TMovingImage, TField>::VelocityFieldType::Pointer
 LogDomainDeformableRegistrationFilter<TFixedImage, TMovingImage, TField>
 ::GetVelocityField(void) /* const HACK I think this should be a const function */
 {
-  return this->GetOutput(VELOCITYFIELD_IMAGE_CODE);
+  typename LogDomainDeformableRegistrationFilter<TFixedImage, TMovingImage, TField>::VelocityFieldType::Pointer
+    tmpVelocityField=this->GetOutput(VELOCITYFIELD_IMAGE_CODE);
+  return tmpVelocityField;
 }
 
 // Set the moving image.

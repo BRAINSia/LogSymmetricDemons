@@ -153,8 +153,6 @@ int main(int /* argc */, char * /* argv */[] )
   try
     {
     const unsigned int ImageDimension = 2;
-    //HACK!
-    itk::MultiThreader::SetGlobalMaximumNumberOfThreads(1);
     typedef itk::Vector<float, ImageDimension>     VectorType;
     typedef itk::Image<VectorType, ImageDimension> FieldType;
     typedef itk::Image<float, ImageDimension>      ImageType;

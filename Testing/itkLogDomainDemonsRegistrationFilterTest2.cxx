@@ -110,8 +110,6 @@ int main(int, char * [] )
   try
     {
     const unsigned int ImageDimension = 3;
-    //HACK!
-    itk::MultiThreader::SetGlobalMaximumNumberOfThreads(1);
     typedef itk::Vector<float, ImageDimension>     VectorType;
     typedef itk::Image<VectorType, ImageDimension> FieldType;
     typedef itk::Image<float, ImageDimension>      ImageType;
