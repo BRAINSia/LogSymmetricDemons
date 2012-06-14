@@ -11,6 +11,11 @@ SD_UNIT_TEST(itkSymmetricLogDomainDemonsRegistrationFilterTest2.cxx EXTLIBS ${Li
 SD_UNIT_TEST(itkTransformToVelocityFieldSourceTest.cxx EXTLIBS ${Libraries})
 SD_UNIT_TEST(itkDisplacementToVelocityFieldLogFilterTest.cxx EXTLIBS ${Libraries})
 
+set_test_properties( itkLogDomainDemonsRegistrationFilterTest
+  itkLogDomainDemonsRegistrationFilterTest2
+  PROPERTIES TIMEOUT 6000 )
+
+
 if(MATLAB_FOUND)
   include_directories(${MATLAB_INCLUDE_DIR})
   SD_UNIT_TEST(vnl_sd_matrix_tools_test.cxx EXTLIBS ${Libraries} MATLAB_ENG MATLAB_MX)
