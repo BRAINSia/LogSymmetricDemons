@@ -94,16 +94,16 @@ protected:
   itkGetObjectMacro( Adder, AdderType );
 
   /** Set/Get the multipliers. */
-  itkSetObjectMacro( Multiplier, MultiplierType );
-  itkGetObjectMacro( Multiplier, MultiplierType );
-  itkSetObjectMacro( Multiplier2, MultiplierType );
-  itkGetObjectMacro( Multiplier2, MultiplierType );
+  itkSetObjectMacro( MultiplierByHalf, MultiplierType );
+  itkGetObjectMacro( MultiplierByHalf, MultiplierType );
+  itkSetObjectMacro( MultiplierByTwelfth, MultiplierType );
+  itkGetObjectMacro( MultiplierByTwelfth, MultiplierType );
 
   /** Set/Get the Lie bracket filters. */
-  itkSetObjectMacro( LieBracketFilter, LieBracketFilterType );
-  itkGetObjectMacro( LieBracketFilter, LieBracketFilterType );
-  itkSetObjectMacro( LieBracketFilter2, LieBracketFilterType );
-  itkGetObjectMacro( LieBracketFilter2, LieBracketFilterType );
+  itkSetObjectMacro( LieBracketFilterFirstOrder, LieBracketFilterType );
+  itkGetObjectMacro( LieBracketFilterFirstOrder, LieBracketFilterType );
+  itkSetObjectMacro( LieBracketFilterSecondOrder, LieBracketFilterType );
+  itkGetObjectMacro( LieBracketFilterSecondOrder, LieBracketFilterType );
 
 #if ( ITK_VERSION_MAJOR < 3 ) || ( ITK_VERSION_MAJOR == 3 && ITK_VERSION_MINOR < 13 )
   virtual void SetInPlace(const bool b)
@@ -122,10 +122,10 @@ private:
   void operator=(const Self &);                    // purposely not implemented
 
   AdderPointer            m_Adder;
-  LieBracketFilterPointer m_LieBracketFilter;
-  LieBracketFilterPointer m_LieBracketFilter2;
-  MultiplierPointer       m_Multiplier;
-  MultiplierPointer       m_Multiplier2;
+  LieBracketFilterPointer m_LieBracketFilterFirstOrder;
+  LieBracketFilterPointer m_LieBracketFilterSecondOrder;
+  MultiplierPointer       m_MultiplierByHalf;
+  MultiplierPointer       m_MultiplierByTwelfth;
   unsigned int            m_NumberOfApproximationTerms;
 
 };
