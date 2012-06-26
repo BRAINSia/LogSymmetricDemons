@@ -4,7 +4,7 @@
 # libraries are found and used
 # ahead of system libs
 package=LogSymmetricDemons
-giturl=git@github.com:Chaircrusher/LogSymmetricDemons.git
+giturl=git@github.com:BRAINSia/LogSymmetricDemons.git
 buildtop=/SuperBuild
 #
 # when run by cron, the path variable is only /bin:/usr/bin
