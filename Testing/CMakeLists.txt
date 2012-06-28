@@ -80,3 +80,14 @@ else(KWSTYLE_EXECUTABLE)
   message("Did not find KWStyle - the style test will not be run")
 endif(KWSTYLE_EXECUTABLE)
 endif()
+
+add_executable(MakeTestImages MakeTestImages.cxx)
+target_link_libraries(MakeTestImages ${ITK_LIBRARIES})
+
+add_test(MakeTestImages COMMAND  ${PROJECT_BINARY_DIR}/bin/MakeTestImages
+  ${PROJECT_BINARY_DIR}/Testing/ellipse.png
+  ${PROJECT_BINARY_DIR}/Testing/box.png
+  ${PROJECT_BINARY_DIR}/Testing/box45.png
+  ${PROJECT_BINARY_DIR}/Testing/star.png
+  ${PROJECT_BINARY_DIR}/Testing/xorstar.png
+  )
