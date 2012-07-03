@@ -84,7 +84,7 @@ endif()
 add_executable(MakeTestImages MakeTestImages.cxx)
 target_link_libraries(MakeTestImages ${ITK_LIBRARIES})
 
-add_test(MakeTestImages COMMAND  ${PROJECT_BINARY_DIR}/bin/MakeTestImages
+add_test(NAME MakeTestImages COMMAND  ${PROJECT_BINARY_DIR}/bin/MakeTestImages
   ${PROJECT_BINARY_DIR}/Testing/ellipse.png
   ${PROJECT_BINARY_DIR}/Testing/box.png
   ${PROJECT_BINARY_DIR}/Testing/box45.png
