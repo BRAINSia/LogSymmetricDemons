@@ -546,11 +546,11 @@ SymmetricLogDomainDemonsRegistrationFilter<TFixedImage, TMovingImage, TField>
     Zf->DisconnectPipeline();
 
     // Now get Z( -v, K_fluid * u_backward )
-    typedef OppositeImageFilter<
-      VelocityFieldType, VelocityFieldType>  OppositeFilterType;
+    typedef MultiplyByConstantType OppositeFilterType;
 
     typename OppositeFilterType::Pointer oppositefilter = OppositeFilterType::New();
     oppositefilter->SetInput( this->GetVelocityField() );
+    oppositefilter->SetConstant( -1.0 );
     oppositefilter->InPlaceOn();
 
     bchfilter->SetInput( 0, oppositefilter->GetOutput() );
