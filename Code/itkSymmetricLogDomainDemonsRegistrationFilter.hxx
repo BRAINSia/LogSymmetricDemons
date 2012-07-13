@@ -2,8 +2,6 @@
 #define __itkSymmetricLogDomainDemonsRegistrationFilter_txx
 
 #include "itkSymmetricLogDomainDemonsRegistrationFilter.h"
-
-#include "itkOppositeImageFilter.h"
 #include "itkSubtractImageFilter.h"
 #include "itkVelocityFieldBCHCompositionFilter.h"
 
@@ -546,9 +544,9 @@ SymmetricLogDomainDemonsRegistrationFilter<TFixedImage, TMovingImage, TField>
     Zf->DisconnectPipeline();
 
     // Now get Z( -v, K_fluid * u_backward )
-    typedef MultiplyByConstantType OppositeFilterType;
+    typedef MultiplyByConstantType MultipyByNegativeOneFilterType;
 
-    typename OppositeFilterType::Pointer oppositefilter = OppositeFilterType::New();
+    typename MultipyByNegativeOneFilterType::Pointer oppositefilter = MultipyByNegativeOneFilterType::New();
     oppositefilter->SetInput( this->GetVelocityField() );
     oppositefilter->SetConstant( -1.0 );
     oppositefilter->InPlaceOn();

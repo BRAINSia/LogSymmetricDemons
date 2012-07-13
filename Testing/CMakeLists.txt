@@ -1,7 +1,6 @@
 SD_UNIT_TEST(itkDisplacementFieldCompositionFilterTest.cxx EXTLIBS ${Libraries})
 SD_UNIT_TEST(itkVelocityFieldLieBracketFilterTest.cxx EXTLIBS ${Libraries})
 SD_UNIT_TEST(itkLogDomainDeformableRegistrationFilterTest.cxx EXTLIBS ${Libraries})
-SD_UNIT_TEST(itkOppositeImageFilterTest.cxx EXTLIBS ${Libraries})
 SD_UNIT_TEST(itkExponentialDisplacementFieldImageFilterTest.cxx EXTLIBS ${Libraries})
 SD_UNIT_TEST(itkVelocityFieldBCHCompositionFilterTest.cxx EXTLIBS ${Libraries})
 SD_UNIT_TEST(itkLogDomainDemonsRegistrationFilterTest.cxx EXTLIBS ${Libraries})
