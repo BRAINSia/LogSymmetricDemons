@@ -5,10 +5,9 @@
 #include <iostream>
 
 #include "itkAffineTransform.h"
-#include "itkExponentialDisplacementFieldImageFilter_LSD.h"
+#include "itkExponentialDisplacementFieldImageFilter.h"
 #include "itkResampleImageFilter.h"
 #include "itkTransformToVelocityFieldSource.h"
-
 int main(int, char * [] )
 {
   /** Typedefs. */
@@ -17,31 +16,14 @@ int main(int, char * [] )
   typedef float  ScalarPixelType;
   typedef double CoordRepresentationType;
 
-  typedef itk::Vector<
-    ScalarPixelType, Dimension>            VectorPixelType;
-
-  typedef itk::Image<
-    VectorPixelType, Dimension>            VelocityFieldType;
-
-  typedef itk::Image<
-    VectorPixelType, Dimension>            DeformationFieldType;
-
-  typedef itk::TranslationTransform<
-    CoordRepresentationType, Dimension>    TranslationTransformType;
-
-  typedef itk::AffineTransform<
-    CoordRepresentationType, Dimension>    AffineTransformType;
-
-  typedef AffineTransformType::ParametersType
-  ParametersType;
-
-  typedef itk::TransformToVelocityFieldSource<
-    VelocityFieldType,
-    CoordRepresentationType>               VelocityFieldGeneratorType;
-
-  typedef itk::ExponentialDisplacementFieldImageFilter_LSD<
-    VelocityFieldType,
-    DeformationFieldType>                  ExponentialFieldFilterType;
+  typedef itk::Vector<ScalarPixelType, Dimension> VectorPixelType;
+  typedef itk::Image<VectorPixelType, Dimension>  VelocityFieldType;
+  typedef itk::Image<VectorPixelType, Dimension>  DeformationFieldType;
+  typedef itk::TranslationTransform<CoordRepresentationType, Dimension>    TranslationTransformType;
+  typedef itk::AffineTransform<CoordRepresentationType, Dimension>    AffineTransformType;
+  typedef AffineTransformType::ParametersType ParametersType;
+  typedef itk::TransformToVelocityFieldSource<VelocityFieldType, CoordRepresentationType> VelocityFieldGeneratorType;
+  typedef itk::ExponentialDisplacementFieldImageFilter<VelocityFieldType, DeformationFieldType> ExponentialFieldFilterType;
 
   typedef VelocityFieldType::SizeType      SizeType;
   typedef VelocityFieldType::SpacingType   SpacingType;

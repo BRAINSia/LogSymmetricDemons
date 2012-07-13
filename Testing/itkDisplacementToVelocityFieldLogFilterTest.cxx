@@ -8,7 +8,7 @@
 #include "itkIndex.h"
 #include "itkImage.h"
 #include "itkImageRegionIteratorWithIndex.h"
-#include "itkExponentialDisplacementFieldImageFilter_LSD.h"
+#include "itkExponentialDisplacementFieldImageFilter.h"
 #include "itkDisplacementToVelocityFieldLogFilter.h"
 #include "vnl/vnl_math.h"
 #include <vnl/vnl_random.h>
@@ -76,7 +76,7 @@ int main(int, char * [] )
 
   std::cout << "Exponentiate the velocity field." << std::endl;
 
-  typedef itk::ExponentialDisplacementFieldImageFilter_LSD<FieldType, FieldType> ExpFilterType;
+  typedef itk::ExponentialDisplacementFieldImageFilter<FieldType, FieldType> ExpFilterType;
   ExpFilterType::Pointer exper = ExpFilterType::New();
   exper->SetInput( field );
 

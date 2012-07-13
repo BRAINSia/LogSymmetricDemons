@@ -3,7 +3,7 @@
 
 #include <itkImageToImageFilter.h>
 #include "itkDisplacementFieldCompositionFilter.h"
-#include "itkExponentialDisplacementFieldImageFilter_LSD.h"
+#include "itkExponentialDisplacementFieldImageFilter.h"
 #include "itkVelocityFieldBCHCompositionFilter.h"
 #include "itkVelocityFieldExponentialComposedWithDisplacementFieldFilter.h"
 #include <itkRecursiveGaussianImageFilter.h>

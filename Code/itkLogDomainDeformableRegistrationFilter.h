@@ -2,7 +2,7 @@
 #define __itkLogDomainDeformableRegistrationFilter_h
 
 #include "itkDenseFiniteDifferenceImageFilter.h"
-#include "itkExponentialDisplacementFieldImageFilter_LSD.h"
+#include "itkExponentialDisplacementFieldImageFilter.h"
 #include "itkPDEDeformableRegistrationFunction.h"
 
 
@@ -229,7 +229,7 @@ protected:
   void PrintSelf(std::ostream& os, Indent indent) const;
 
   /** Exponential type */
-  typedef ExponentialDisplacementFieldImageFilter_LSD<
+  typedef ExponentialDisplacementFieldImageFilter<
     VelocityFieldType, DeformationFieldType>      FieldExponentiatorType;
 
   typedef typename FieldExponentiatorType::Pointer FieldExponentiatorPointer;
