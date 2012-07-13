@@ -13,10 +13,11 @@
 #include "itkSmoothingRecursiveGaussianImageFilter.h"
 #include "itkStreamingImageFilter.h"
 #include "itkAddImageFilter.h"
-#include "itkMultiplyByConstantImageFilter.h"
+#include "itkMultiplyImageFilter.h"
 #include "vnl/vnl_math.h"
 #include <vnl/vnl_random.h>
 #include "itkCommand.h"
+#include "itkMultiplyImageFilter.h"
 
 // The following three classes are used to support callbacks
 // on the filter in the pipeline that follows later
@@ -291,7 +292,8 @@ int main(int, char * [] )
   AdderType::Pointer adder2 = AdderType::New();
 
   // Multiplier
-  typedef itk::MultiplyByConstantImageFilter<FieldType, double, FieldType> MultiplyByConstantType;
+  typedef itk::MultiplyImageFilter<FieldType,
+          itk::Image<double,FieldType::ImageDimension>, FieldType> MultiplyByConstantType;
   MultiplyByConstantType::Pointer multiplier = MultiplyByConstantType::New();
   MultiplyByConstantType::Pointer multiplier2 = MultiplyByConstantType::New();
 
