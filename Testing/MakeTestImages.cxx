@@ -88,10 +88,10 @@ GetRegion(typename ImageType::Pointer &image,
 
 int main(int argc, char *argv[])
 {
-  if(argc != 6)
+  if(argc != 7)
     {
     std::cerr << "MakeTestImages: Usage MakeTestImages "
-              << "<circleImage> <boxImage> <rotImage> <starImage> <xorStarImage>"
+              << "<circleImage> <boxImage> <rotImage> <starImage> <xorStarImage> <radiusDouble>"
               << std::endl;
     exit(1);
     }
@@ -108,7 +108,7 @@ int main(int argc, char *argv[])
   typedef EllipseType::BoundingBoxType                 BoundingBoxType;
   typedef itk::BoxSpatialObject<2>                     BoxType;
 
-  const double circleRadius = 45.0;
+  const double circleRadius = atof( argv[6] );
 
   // set up region for target images
   RegionType  region;
