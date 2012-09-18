@@ -1,5 +1,5 @@
-#ifndef __itkBCHSchildsLadderParallelTransportOfDisplacementField_h
-#define __itkBCHSchildsLadderParallelTransportOfDisplacementField_h
+#ifndef __itkBCHSchildsLadderParallelTransportOfVelocityField_h
+#define __itkBCHSchildsLadderParallelTransportOfVelocityField_h
 
 #include <itkImageToImageFilter.h>
 #include <itkNaryAddImageFilter.h>
@@ -8,12 +8,9 @@
 
 namespace itk
 {
-  /* TODO:  JOY Change all of this documentaiton to be wonderfully currect and
-   * and point to the exact formulas and pages in the various documentation.
-   *  Exp(v) o Exp(u) o Exp(-v) = <<<   >>>
-   */
+/* TODO: edit doc */
 
-/** \class BCHSchildsLadderParallelTransportOfDisplacementField
+/** \class BCHSchildsLadderParallelTransportOfVelocityField
  * \brief Compute Baker-Campbell-Hausdorff formula on two vector fields.
  *
  * See M. Bossa, M. Hernandez and S.Olmos, "Contributions to 3D diffeomorphic atlas
@@ -40,12 +37,12 @@ namespace itk
  * \author Florence Dru, INRIA and Tom Vercauteren, MKT
  */
 template <class TInputImage, class TOutputImage>
-class ITK_EXPORT BCHSchildsLadderParallelTransportOfDisplacementField :
+class ITK_EXPORT BCHSchildsLadderParallelTransportOfVelocityField :
   public InPlaceImageFilter<TInputImage, TOutputImage>
 {
 public:
   /** Standard class typedefs. */
-  typedef BCHSchildsLadderParallelTransportOfDisplacementField             Self;
+  typedef BCHSchildsLadderParallelTransportOfVelocityField             Self;
   typedef InPlaceImageFilter<TInputImage, TOutputImage> Superclass;
   typedef SmartPointer<Self>                            Pointer;
   typedef SmartPointer<const Self>                      ConstPointer;
@@ -65,14 +62,14 @@ public:
   itkNewMacro(Self);
 
   /** Run-time type information (and related methods). */
-  itkTypeMacro( BCHSchildsLadderParallelTransportOfDisplacementField, InPlaceImageFilter );
+  itkTypeMacro( BCHSchildsLadderParallelTransportOfVelocityField, InPlaceImageFilter );
 
   /** Set/Get the NumberOfApproximationOrder used in the BCH approximation. */
   itkSetMacro( NumberOfApproximationOrder, unsigned int );
   itkGetConstMacro( NumberOfApproximationOrder, unsigned int );
 protected:
-  BCHSchildsLadderParallelTransportOfDisplacementField();
-  ~BCHSchildsLadderParallelTransportOfDisplacementField()
+  BCHSchildsLadderParallelTransportOfVelocityField();
+  ~BCHSchildsLadderParallelTransportOfVelocityField()
   {
   };
   void PrintSelf(std::ostream& os, Indent indent) const;
@@ -123,7 +120,7 @@ protected:
 
 #endif
 private:
-  BCHSchildsLadderParallelTransportOfDisplacementField(const Self &); // purposely not implemented
+  BCHSchildsLadderParallelTransportOfVelocityField(const Self &); // purposely not implemented
   void operator=(const Self &);                    // purposely not implemented
 
   AdderPointer            m_Adder;
@@ -137,7 +134,7 @@ private:
 } // end namespace itk
 
 #ifndef ITK_MANUAL_INSTANTIATION
-#include "itkBCHSchildsLadderParallelTransportOfDisplacementField.hxx"
+#include "itkBCHSchildsLadderParallelTransportOfVelocityField.hxx"
 #endif
 
 #endif

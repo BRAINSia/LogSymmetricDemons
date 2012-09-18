@@ -1,6 +1,6 @@
-#ifndef __itkBCHSchildsLadderParallelTransportOfDisplacementField_txx
-#define __itkBCHSchildsLadderParallelTransportOfDisplacementField_txx
-#include "itkBCHSchildsLadderParallelTransportOfDisplacementField.h"
+#ifndef __itkBCHSchildsLadderParallelTransportOfVelocityField_txx
+#define __itkBCHSchildsLadderParallelTransportOfVelocityField_txx
+#include "itkBCHSchildsLadderParallelTransportOfVelocityField.h"
 
 #include <itkProgressAccumulator.h>
 
@@ -11,8 +11,8 @@ namespace itk
  * Default constructor.
  */
 template <class TInputImage, class TOutputImage>
-BCHSchildsLadderParallelTransportOfDisplacementField<TInputImage, TOutputImage>
-::BCHSchildsLadderParallelTransportOfDisplacementField()
+BCHSchildsLadderParallelTransportOfVelocityField<TInputImage, TOutputImage>
+::BCHSchildsLadderParallelTransportOfVelocityField()
 {
   // Setup the number of required inputs
   this->SetNumberOfRequiredInputs( 2 );
@@ -21,7 +21,7 @@ BCHSchildsLadderParallelTransportOfDisplacementField<TInputImage, TOutputImage>
   this->InPlaceOff();
 
   // Set number of apprximation terms to default value
-  m_NumberOfApproximationTerms = 2;
+  m_NumberOfApproximationTerms = 5;
 
   // Declare sub filters
   m_Adder = AdderType::New();
@@ -36,6 +36,7 @@ BCHSchildsLadderParallelTransportOfDisplacementField<TInputImage, TOutputImage>
 
   m_MultiplierByHalf->SetConstant( 0.5 );
   m_MultiplierByTwelfth->SetConstant( 1.0 / 12.0 );
+  m_MultiplierByNegTwelfth->SetConstant( -1.0 /12.0);
 }
 
 /**
@@ -43,7 +44,7 @@ BCHSchildsLadderParallelTransportOfDisplacementField<TInputImage, TOutputImage>
  */
 template <class TInputImage, class TOutputImage>
 void
-BCHSchildsLadderParallelTransportOfDisplacementField<TInputImage, TOutputImage>
+BCHSchildsLadderParallelTransportOfVelocityField<TInputImage, TOutputImage>
 ::PrintSelf(std::ostream& os, Indent indent) const
 {
   Superclass::PrintSelf(os, indent);
@@ -53,6 +54,7 @@ BCHSchildsLadderParallelTransportOfDisplacementField<TInputImage, TOutputImage>
   os << indent << "LieBracketFilterSecondOrder: " << m_LieBracketFilterSecondOrder << std::endl;
   os << indent << "MultiplierByHalf: " << m_MultiplierByHalf << std::endl;
   os << indent << "MultiplierByTwelfth: " << m_MultiplierByTwelfth << std::endl;
+  os << indent << "MultiplierByNegTwelfth: " << m_MultiplierByNegTwelfth << std::endl;
   os << indent << "NumberOfApproximationTerms: " << m_NumberOfApproximationTerms << std::endl;
 }
 
@@ -61,7 +63,7 @@ BCHSchildsLadderParallelTransportOfDisplacementField<TInputImage, TOutputImage>
  */
 template <class TInputImage, class TOutputImage>
 void
-BCHSchildsLadderParallelTransportOfDisplacementField<TInputImage, TOutputImage>
+BCHSchildsLadderParallelTransportOfVelocityField<TInputImage, TOutputImage>
 ::GenerateData()
 {
   InputFieldConstPointer leftField = this->GetInput(0);
@@ -74,7 +76,7 @@ BCHSchildsLadderParallelTransportOfDisplacementField<TInputImage, TOutputImage>
 
   switch( m_NumberOfApproximationTerms )
     {
-    case 2:
+    case 5:
       {
       // lf + rf + 0.5*liebracket(lf,rf)
       progress->RegisterInternalFilter(m_LieBracketFilterFirstOrder, 0.5);
