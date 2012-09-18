@@ -29,13 +29,16 @@ BCHConjugateActionFilter<TInputImage, TOutputImage>
   m_LieBracketFilterSecondOrder = LieBracketFilterType::New();
   m_MultiplierByHalf = MultiplierType::New();
   m_MultiplierByTwelfth = MultiplierType::New();
+  m_MultiplierByNegTwelfth = MutiplierType::New();
 
   // Multipliers can always be inplace here
   m_MultiplierByHalf->InPlaceOn();
   m_MultiplierByTwelfth->InPlaceOn();
+  m_MultiplierbyNegTwelfth->InPlaceOn();
 
   m_MultiplierByHalf->SetConstant( 0.5 );
   m_MultiplierByTwelfth->SetConstant( 1.0 / 12.0 );
+  m_MultiplierByNegTwelfth->SetConstant( -1.0 / 12.0 );
 }
 
 /**
@@ -53,6 +56,7 @@ BCHConjugateActionFilter<TInputImage, TOutputImage>
   os << indent << "LieBracketFilterSecondOrder: " << m_LieBracketFilterSecondOrder << std::endl;
   os << indent << "MultiplierByHalf: " << m_MultiplierByHalf << std::endl;
   os << indent << "MultiplierByTwelfth: " << m_MultiplierByTwelfth << std::endl;
+  os << indent << "MultiplierByNegTwelfth: " << m_MultiplierNegByTwelfth << std::endl;
   os << indent << "NumberOfApproximationTerms: " << m_NumberOfApproximationTerms << std::endl;
 }
 

@@ -127,6 +127,7 @@ private:
   LieBracketFilterPointer m_LieBracketFilterSecondOrder;
   MultiplierPointer       m_MultiplierByHalf;
   MultiplierPointer       m_MultiplierByTwelfth;
+  MultiplierPointer       m_MultiplierByNegTwelfth;
   unsigned int            m_NumberOfApproximationTerms;
 
 };
