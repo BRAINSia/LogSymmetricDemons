@@ -4,6 +4,7 @@
 #include <itkImageToImageFilter.h>
 #include <itkNaryAddImageFilter.h>
 #include <itkVelocityFieldLieBracketFilter.h>
+#include <itkVelocityFieldCompositionFilter.h>
 #include <itkMultiplyImageFilter.h>
 
 namespace itk

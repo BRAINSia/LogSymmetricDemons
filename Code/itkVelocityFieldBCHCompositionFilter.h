@@ -99,6 +99,8 @@ protected:
   itkGetObjectMacro( MultiplierByHalf, MultiplierType );
   itkSetObjectMacro( MultiplierByTwelfth, MultiplierType );
   itkGetObjectMacro( MultiplierByTwelfth, MultiplierType );
+  itkSetObjectMacro( MultiplierByNegTwelfth, MultiplierType );
+  itkGetObjectMacro( MultiplierByNegTwelfth, MultiplierType );
 
   /** Set/Get the Lie bracket filters. */
   itkSetObjectMacro( LieBracketFilterFirstOrder, LieBracketFilterType );
