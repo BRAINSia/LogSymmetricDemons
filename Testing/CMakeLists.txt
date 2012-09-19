@@ -89,4 +89,5 @@ add_test(NAME MakeTestImages COMMAND  ${PROJECT_BINARY_DIR}/bin/MakeTestImages
   ${PROJECT_BINARY_DIR}/Testing/box45.png
   ${PROJECT_BINARY_DIR}/Testing/star.png
   ${PROJECT_BINARY_DIR}/Testing/xorstar.png
+  45.0
   )
