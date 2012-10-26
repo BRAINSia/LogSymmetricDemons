@@ -7,7 +7,7 @@
 #include "itkAddImageFilter.h"
 #include "itkImageToImageFilter.h"
 #include "itkBCHSchildsLadderParallelTransportOfVelocityField.h"
-#include "itkMultiResolutionLogDomainDeformableRegistration.h"
+#include "itkExponentialDisplacementFieldImageFilter.h"
 #include "itkWarpImageFilter.h"
 
 #include <iostream>
@@ -31,8 +31,8 @@ int main( int argc, char *argv[] )
 
   try
   {
-    typedef itk::Vector< float, 3 > VectorPixelType;
-    typedef itk::Image< VectorPixelType, 3 > VelocityFieldType;
+    typedef itk::Vector< float, 2 > VectorPixelType;
+    typedef itk::Image< VectorPixelType, 2 > VelocityFieldType;
     typedef itk::ImageFileReader< VelocityFieldType > VelocityFieldReaderType;
 
     // Read in stationary velocity fields
@@ -63,40 +63,48 @@ int main( int argc, char *argv[] )
     velocityFieldWriter->SetInput( myBCHer->GetOutput() );
     velocityFieldWriter->Update();
 
-    // Convert transported SVF to deformation/displacment field
-   
+    // Convert transported SVF to deformation/displacement field
+    typedef itk::Image< VectorPixelType, 2 > DeformationFieldType;
+    typedef itk::ExponentialDisplacementFieldImageFilter< VelocityFieldType, DeformationFieldType > FieldExponentiatorType;
+    FieldExponentiatorType::Pointer convertVelToDispField = FieldExponentiatorType::New();
+    convertVelToDispField->SetInput( myBCHer->GetOutput() );
+    convertVelToDispField->ComputeInverseOff();
+    convertVelToDispField->Update();
+    DeformationFieldType::Pointer defField = DeformationFieldType::New();
+    defField = convertVelToDispField->GetOutput();
 
     // Write output deformation/displacement field
-    typedef itk::Image< VectorPixelType, 3 > DeformationFieldType;
     typedef itk::ImageFileWriter< DeformationFieldType > DeformationFieldWriterType;
     DeformationFieldWriterType::Pointer deformationfieldWriter = DeformationFieldWriterType::New();
-    deformationfieldWriter->SetFileName( arg[ 4 ] );
-    deformationfieldWriter->SetInput( defField );
+    deformationfieldWriter->SetFileName( argv[ 4 ] );
+    deformationfieldWriter->SetInput( convertVelToDispField->GetOutput() );
     deformationfieldWriter->Update();
 
     // Read in template image
     typedef float PixelType;
-    typedef itk::Image< PixelType, 3 > ImageType;
-    typedef it::ImageFileReader< ImageType > TemplateImageReaderType;
+    typedef itk::Image< PixelType, 2 > ImageType;
+    typedef itk::ImageFileReader< ImageType > TemplateImageReaderType;
     TemplateImageReaderType::Pointer templateImageReader = TemplateImageReaderType::New();
     templateImageReader->SetFileName( argv[ 5 ] );
     templateImageReader->Update();
+    ImageType::Pointer templateImage = ImageType::New();
+    templateImage = templateImageReader->GetOutput();
 
     // Warp template image with transported SVF
     typedef itk::WarpImageFilter< ImageType, ImageType, DeformationFieldType > WarperType;
     WarperType::Pointer warper = WarperType::New();
-    warper->SetInput( templateImageReader );
-    warper->SetOutputSpacing( fixedImage->GetSpacing() );
-    warper->SetOtuputOrigin( fixedImage->GetOrigin() );
-    warper->SetOutputDirection( fixedImage->GetDirection() );
+    warper->SetInput( templateImage );
+    warper->SetOutputSpacing( defField->GetSpacing() );
+    warper->SetOutputOrigin( defField->GetOrigin() );
+    warper->SetOutputDirection( defField->GetDirection() );
 #if ( ITK_VERSION_MAJOR < 4 )
-    warper->SetDeformationField( defField );
+    warper->SetDeformationField( convertVelToDispField->GetOutput() );
 #else
-    warper->SetDisplacementField( defField );
+    warper->SetDisplacementField( convertVelToDispField->GetOutput() );
 #endif
 
     // Writer out warped template image
-    typedef it::ImageFileWriter< ImageType > ImageWriterType;
+    typedef itk::ImageFileWriter< ImageType > ImageWriterType;
     ImageWriterType::Pointer warpedTemplateImageWriter = ImageWriterType::New();
     warpedTemplateImageWriter->SetFileName( argv[ 6 ] );
     warpedTemplateImageWriter->SetInput( warper->GetOutput() );
