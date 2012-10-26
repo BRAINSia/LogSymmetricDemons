@@ -4,7 +4,7 @@
 #include <itkImageToImageFilter.h>
 #include <itkNaryAddImageFilter.h>
 #include <itkVelocityFieldLieBracketFilter.h>
-#include <itkVelocityFieldCompositionFilter.h>
+#include <itkVelocityFieldBCHCompositionFilter.h>
 #include <itkMultiplyImageFilter.h>
 
 namespace itk
@@ -70,9 +70,7 @@ public:
   itkGetConstMacro( NumberOfApproximationOrder, unsigned int );
 protected:
   BCHSchildsLadderParallelTransportOfVelocityField();
-  ~BCHSchildsLadderParallelTransportOfVelocityField()
-  {
-  };
+  ~BCHSchildsLadderParallelTransportOfVelocityField();
   void PrintSelf(std::ostream& os, Indent indent) const;
 
   /**
@@ -99,8 +97,6 @@ protected:
   /** Set/Get the multipliers. */
   itkSetObjectMacro( MultiplierByHalf, MultiplierType );
   itkGetObjectMacro( MultiplierByHalf, MultiplierType );
-  itkSetObjectMacro( MultiplierByTwelfth, MultiplierType );
-  itkGetObjectMacro( MultiplierByTwelfth, MultiplierType );
 
   /** Set/Get the Lie bracket filters. */
   itkSetObjectMacro( LieBracketFilterFirstOrder, LieBracketFilterType );
@@ -128,7 +124,6 @@ private:
   LieBracketFilterPointer m_LieBracketFilterFirstOrder;
   LieBracketFilterPointer m_LieBracketFilterSecondOrder;
   MultiplierPointer       m_MultiplierByHalf;
-  MultiplierPointer       m_MultiplierByTwelfth;
   unsigned int            m_NumberOfApproximationOrder;
 };
 

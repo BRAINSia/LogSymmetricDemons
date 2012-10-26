@@ -21,23 +21,28 @@ BCHSchildsLadderParallelTransportOfVelocityField<TInputImage, TOutputImage>
   this->InPlaceOff();
 
   // Set number of apprximation terms to default value
-  m_NumberOfApproximationTerms = 5;
+  m_NumberOfApproximationOrder = 5;
 
   // Declare sub filters
   m_Adder = AdderType::New();
   m_LieBracketFilterFirstOrder = LieBracketFilterType::New();
   m_LieBracketFilterSecondOrder = LieBracketFilterType::New();
   m_MultiplierByHalf = MultiplierType::New();
-  m_MultiplierByTwelfth = MultiplierType::New();
 
   // Multipliers can always be inplace here
   m_MultiplierByHalf->InPlaceOn();
-  m_MultiplierByTwelfth->InPlaceOn();
 
   m_MultiplierByHalf->SetConstant( 0.5 );
-  m_MultiplierByTwelfth->SetConstant( 1.0 / 12.0 );
-  m_MultiplierByNegTwelfth->SetConstant( -1.0 /12.0);
 }
+  
+/**
+ * Default destructor.
+ */
+template <class TInputImage, class TOutputImage>
+BCHSchildsLadderParallelTransportOfVelocityField<TInputImage, TOutputImage>
+::~BCHSchildsLadderParallelTransportOfVelocityField()
+{}
+
 
 /**
  * Standard PrintSelf method.
@@ -53,9 +58,7 @@ BCHSchildsLadderParallelTransportOfVelocityField<TInputImage, TOutputImage>
   os << indent << "LieBracketFilterFirstOrder: " << m_LieBracketFilterFirstOrder << std::endl;
   os << indent << "LieBracketFilterSecondOrder: " << m_LieBracketFilterSecondOrder << std::endl;
   os << indent << "MultiplierByHalf: " << m_MultiplierByHalf << std::endl;
-  os << indent << "MultiplierByTwelfth: " << m_MultiplierByTwelfth << std::endl;
-  os << indent << "MultiplierByNegTwelfth: " << m_MultiplierByNegTwelfth << std::endl;
-  os << indent << "NumberOfApproximationTerms: " << m_NumberOfApproximationTerms << std::endl;
+  os << indent << "NumberOfApproximationOrder: " << m_NumberOfApproximationOrder << std::endl;
 }
 
 /**
@@ -74,24 +77,28 @@ BCHSchildsLadderParallelTransportOfVelocityField<TInputImage, TOutputImage>
 
   progress->SetMiniPipelineFilter(this);
 
-  switch( m_NumberOfApproximationTerms )
+  switch( m_NumberOfApproximationOrder )
     {
     case 5:
       {
-      // lf + rf + 0.5*liebracket(lf,rf)
       progress->RegisterInternalFilter(m_LieBracketFilterFirstOrder, 0.5);
       progress->RegisterInternalFilter(m_MultiplierByHalf, 0.2);
       progress->RegisterInternalFilter(m_Adder, 0.3);
 
-      m_LieBracketFilterFirstOrder->SetInput( 0, leftField );
-      m_LieBracketFilterFirstOrder->SetInput( 1, rightField );
+      // u = leftField
+      // v = rightField
+      m_LieBracketFilterFirstOrder->SetInput( 0, rightField );
+      m_LieBracketFilterFirstOrder->SetInput( 1, leftField );
 
-      m_MultiplierByHalf->SetInput( m_LieBracketFilterFirstOrder->GetOutput() );
-      // constant set to 0.5 in constructor
+      m_LieBracketFilterSecondOrder->SetInput( 0, rightField );
+      m_LieBracketFilterSecondOrder->SetInput( 1, m_LieBracketFilterFirstOrder->GetOutput() );
+      m_MultiplierByHalf->SetInput( m_LieBracketFilterSecondOrder->GetOutput() );
 
-      m_Adder->SetInput( 0, m_MultiplierByHalf->GetOutput() );
-      m_Adder->SetInput( 1, leftField );
-      m_Adder->SetInput( 2, rightField );
+      // u + [v, u] + 0.5 * [v, [v, u]]
+      m_Adder->SetInput( 0, leftField );
+      m_Adder->SetInput( 1, m_LieBracketFilterFirstOrder->GetOutput() );
+      m_Adder->SetInput( 2, m_MultiplierByHalf->GetOutput() );
+  
 #if ( ITK_VERSION_MAJOR < 3 ) || ( ITK_VERSION_MAJOR == 3 && ITK_VERSION_MINOR < 13 )
       // Work-around for http://www.itk.org/Bug/view.php?id=8672
       m_Adder->InPlaceOff();
@@ -103,8 +110,8 @@ BCHSchildsLadderParallelTransportOfVelocityField<TInputImage, TOutputImage>
       }
     default:
       {
-      itkExceptionMacro(<< "NumberOfApproximationTerms ("
-                        << m_NumberOfApproximationTerms << ") not supported");
+      itkExceptionMacro(<< "NumberOfApproximationOrder ("
+                        << m_NumberOfApproximationOrder << ") not supported");
       }
     }
 
