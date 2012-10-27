@@ -397,6 +397,11 @@ int main(int /* argc */, char * /* argv */[] )
 
     // --------------------------------------------------------------
     std::cout << "Test exception handling." << std::endl;
+#if !defined(NDEBUG)
+  //In ITKv4 this situation was addressed more aggressively
+  //by throwing an assert in debug mode rather than
+  //an exception.  Therefore, this part of the test can
+  //not be run in debug mode.
     std::cout << "Test NULL moving image. " << std::endl;
     try
       {
@@ -418,6 +423,7 @@ int main(int /* argc */, char * /* argv */[] )
       std::cout << "UNKNOWN exception properly handled by ignoring the above error." << std::endl;
       std::cout << "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^" << std::endl;
       }
+#endif
     if( !testPassed )
       {
       std::cout << "Test failed" << std::endl;
