@@ -91,3 +91,6 @@ add_test(NAME MakeTestImages COMMAND  ${PROJECT_BINARY_DIR}/bin/MakeTestImages
   ${PROJECT_BINARY_DIR}/Testing/xorstar.png
   45.0
   )
+
+add_executable(DistanceMaps DistanceMaps.cxx)
+target_link_libraries(DistanceMaps ${ITK_LIBRARIES})
