@@ -51,14 +51,14 @@ int main( int argc, char * argv[] )
   dupDistMap->SetInputImage( filter->GetOutput() );
   dupDistMap->Update();
 
-  typedef itk::ImageRegionIterator< OutputImageType > ImageRegionIteratorType;
-  ImageRegionIteratorType BinaryImageItr( binaryImageReader->GetOutput(), binaryImageReader->GetOutput->GetRequestedRegion() );
+  typedef itk::ImageRegionIterator< InputImageType > ImageRegionIteratorType;
+  ImageRegionIteratorType BinaryImageItr( binaryImageReader->GetOutput(), binaryImageReader->GetOutput()->GetRequestedRegion() );
   for( BinaryImageItr.GoToBegin(); !BinaryImageItr.IsAtEnd(); ++BinaryImageItr )
   {
     OutputImageType::IndexType idx = BinaryImageItr.GetIndex();
     if( binaryImageReader->GetOutput()->GetPixel( idx ) == 0 )
     {
-      dupDistMap->GetOutput()->SetPixel( idx, 0 );
+      dupDistMap->GetOutput()->SetPixel( idx, 0.0 );
       dupDistMap->Update();
     }
   }
