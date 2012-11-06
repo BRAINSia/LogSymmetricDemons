@@ -97,3 +97,6 @@ target_link_libraries(DistanceMaps2D ${ITK_LIBRARIES})
 
 add_executable(ConvertSVFToDefAndWarp2D ConvertSVFToDefAndWarp2D.cxx)
 target_link_libraries(ConvertSVFToDefAndWarp2D ${ITK_LIBRARIES})
+
+add_executable(MakeTestImages3D MakeTestImages3D.cxx)
+target_link_libraries(MakeTestImages3D ${ITK_LIBRARIES})
