@@ -193,7 +193,7 @@ int main(int argc, char *argv[])
   // re-use the box spatial object, adding a 45 deg rotation to
   // the translation. It will be rotated around its own origin, which
   // will correspond to 0,0 in world coordinates, or the center of the image.
-  box->GetObjectToParentTransform()->Rotate2D(vnl_math::pi/4.0);
+  box->GetObjectToParentTransform()->Rotate3D(boxOrigin, vnl_math::pi/4.0);
   box->ComputeObjectToWorldTransform();
   box->ComputeBoundingBox();
 
