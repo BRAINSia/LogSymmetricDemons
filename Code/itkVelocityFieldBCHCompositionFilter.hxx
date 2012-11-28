@@ -115,45 +115,11 @@ VelocityFieldBCHCompositionFilter<TInputImage, TOutputImage>
       }
     case 4:
       {
-      //TODO:  THERE IS A BUG  a term is missing here.  Bosa or Sheilds ladder has correct terms:
-      // JTM: I know it's silly but maybe we should add a case 5
-      // to keep things consistent if we want a 5th term.
-      // lf + rf + 0.5*liebracket(lf,rf) + (1/12)*liebracket(lf,*liebracket(lf,rf))
-      progress->RegisterInternalFilter(m_LieBracketFilterFirstOrder, 0.3);
-      progress->RegisterInternalFilter(m_MultiplierByHalf, 0.15);
-      progress->RegisterInternalFilter(m_LieBracketFilterSecondOrder, 0.3);
-      progress->RegisterInternalFilter(m_MultiplierByTwelfth, 0.15);
-      progress->RegisterInternalFilter(m_Adder, 0.1);
-
-      m_LieBracketFilterFirstOrder->SetInput( 0, leftField );
-      m_LieBracketFilterFirstOrder->SetInput( 1, rightField );
-
-      m_LieBracketFilterSecondOrder->SetInput( 0, leftField );
-      m_LieBracketFilterSecondOrder->SetInput( 1, m_LieBracketFilterFirstOrder->GetOutput() );
-
-      m_MultiplierByHalf->SetInput( m_LieBracketFilterFirstOrder->GetOutput() );
-      // constant set to 0.5 in constructor
-
-      m_MultiplierByTwelfth->SetInput( m_LieBracketFilterSecondOrder->GetOutput() );
-      // constant set to 1/12 in constructor
-
-      m_Adder->SetInput( 0, m_MultiplierByHalf->GetOutput() );
-      m_Adder->SetInput( 1, leftField );
-      m_Adder->SetInput( 2, rightField );
-      m_Adder->SetInput( 3, m_MultiplierByTwelfth->GetOutput() );
-#if ( ITK_VERSION_MAJOR < 3 ) || ( ITK_VERSION_MAJOR == 3 && ITK_VERSION_MINOR < 13 )
-      // Work-around for http://www.itk.org/Bug/view.php?id=8672
-      m_Adder->InPlaceOff();
-#else
-      // Adder can be inplace since the 0th input is a temp field
-      m_Adder->InPlaceOn();
-#endif
-      break;
-      }
-    case 5:
-      {
+      // Note: Although this case is for 4 BCH terms, there really is 5 terms used
+      // to make it a symmetric approximation.
       // lf + rf + 0.5*liebracket(lf,rf) + (1/12)*liebracket(lf,*liebracket(lf,rf)) 
       // + (-1/12)*liebracket(rf,*liebracket(rf,lf))
+      std::cout << "5 terms: lf + rf + 0.5*liebracket(lf,rf) + (1/12)*liebracket(lf,*liebracket(lf,rf)) + (-1/12)*liebracket(rf,*liebracket(rf,lf))" << std::endl;
       progress->RegisterInternalFilter(m_LieBracketFilterFirstOrder, 0.3);
       progress->RegisterInternalFilter(m_MultiplierByHalf, 0.1);
       progress->RegisterInternalFilter(m_LieBracketFilterSecondOrder, 0.3);
@@ -184,7 +150,7 @@ VelocityFieldBCHCompositionFilter<TInputImage, TOutputImage>
       m_Adder->SetInput( 2, rightField );
       m_Adder->SetInput( 3, m_MultiplierByTwelfth->GetOutput() );
       m_Adder->SetInput( 4, m_MultiplierByNegTwelfth->GetOutput() );
-
+      
 #if ( ITK_VERSION_MAJOR < 3 ) || ( ITK_VERSION_MAJOR == 3 && ITK_VERSION_MINOR < 13 )
       // Work-around for http://www.itk.org/Bug/view.php?id=8672
       m_Adder->InPlaceOff();
@@ -193,11 +159,6 @@ VelocityFieldBCHCompositionFilter<TInputImage, TOutputImage>
       m_Adder->InPlaceOn();
 #endif
       break;
-      }
-    default:
-      {
-      itkExceptionMacro(<< "NumberOfApproximationTerms ("
-                        << m_NumberOfApproximationTerms << ") not supported");
       }
     }
 
