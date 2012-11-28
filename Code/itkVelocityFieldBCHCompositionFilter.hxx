@@ -119,7 +119,6 @@ VelocityFieldBCHCompositionFilter<TInputImage, TOutputImage>
       // to make it a symmetric approximation.
       // lf + rf + 0.5*liebracket(lf,rf) + (1/12)*liebracket(lf,*liebracket(lf,rf)) 
       // + (-1/12)*liebracket(rf,*liebracket(rf,lf))
-      std::cout << "5 terms: lf + rf + 0.5*liebracket(lf,rf) + (1/12)*liebracket(lf,*liebracket(lf,rf)) + (-1/12)*liebracket(rf,*liebracket(rf,lf))" << std::endl;
       progress->RegisterInternalFilter(m_LieBracketFilterFirstOrder, 0.3);
       progress->RegisterInternalFilter(m_MultiplierByHalf, 0.1);
       progress->RegisterInternalFilter(m_LieBracketFilterSecondOrder, 0.3);
