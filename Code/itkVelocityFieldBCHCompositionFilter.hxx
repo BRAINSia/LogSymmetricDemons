@@ -149,7 +149,7 @@ VelocityFieldBCHCompositionFilter<TInputImage, TOutputImage>
       m_Adder->SetInput( 2, rightField );
       m_Adder->SetInput( 3, m_MultiplierByTwelfth->GetOutput() );
       m_Adder->SetInput( 4, m_MultiplierByNegTwelfth->GetOutput() );
-      
+
 #if ( ITK_VERSION_MAJOR < 3 ) || ( ITK_VERSION_MAJOR == 3 && ITK_VERSION_MINOR < 13 )
       // Work-around for http://www.itk.org/Bug/view.php?id=8672
       m_Adder->InPlaceOff();
@@ -158,6 +158,11 @@ VelocityFieldBCHCompositionFilter<TInputImage, TOutputImage>
       m_Adder->InPlaceOn();
 #endif
       break;
+      }
+    default:
+      {
+      itkExceptionMacro(<< "NumberOfApproximationTerms ("
+                        << m_NumberOfApproximationTerms << ") not supported");
       }
     }
 
