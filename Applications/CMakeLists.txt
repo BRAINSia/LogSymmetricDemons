@@ -3,6 +3,7 @@ SD_EXECUTABLE(DemonsRegistration.cxx EXTLIBS ${Libraries})
 SD_EXECUTABLE(LogDomainDemonsRegistration.cxx EXTLIBS ${Libraries})
 SD_EXECUTABLE(InverseDisplacementField.cxx EXTLIBS ${Libraries})
 SD_EXECUTABLE(TransportStationaryVelocityField2D.cxx EXTLIBS ${Libraries})
+SD_EXECUTABLE(TransportStationaryVelocityField3D.cxx EXTLIBS ${Libraries})
 SD_EXECUTABLE(ConvertMhaToNifti.cxx EXTLIBS ${Libraries})
 
 #add_test(RegisterImages ${MY_EXE_DIR}/DemonsRegistration -f ${CMAKE_SOURCE_DIR}/RatLungSlice1.mha -m ${CMAKE_SOURCE_DIR}/RatLungSlice2.mha -d -s 2 -g 1 -i 3x5 -e)
