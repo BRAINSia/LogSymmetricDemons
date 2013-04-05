@@ -326,7 +326,7 @@ template <class TFixedImage, class TMovingImage, class TField>
 typename
 SymmetricLogDomainDemonsRegistrationFilter<TFixedImage, TMovingImage, TField>::TimeStepType
 SymmetricLogDomainDemonsRegistrationFilter<TFixedImage, TMovingImage, TField>
-::ThreadedCalculateChange(const ThreadRegionType & regionToProcess, int)
+::ThreadedCalculateChange(const ThreadRegionType & regionToProcess, ThreadIdType)
 {
   typedef typename VelocityFieldType::RegionType     RegionType;
   typedef typename VelocityFieldType::SizeType       SizeType;

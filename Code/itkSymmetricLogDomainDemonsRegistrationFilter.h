@@ -158,11 +158,9 @@ protected:
 
   typedef typename VelocityFieldType::RegionType ThreadRegionType;
 
-  using Superclass::ThreadedCalculateChange;
-
   /** Does the actual work of calculating change over a region supplied by
    * the multithreading mechanism. */
-  virtual TimeStepType ThreadedCalculateChange(const ThreadRegionType & regionToProcess, int threadId);
+  virtual TimeStepType ThreadedCalculateChange(const ThreadRegionType & regionToProcess, ThreadIdType threadId);
 
   /** Apply update. */
 #if (ITK_VERSION_MAJOR < 4)
