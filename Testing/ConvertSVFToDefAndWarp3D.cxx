@@ -10,16 +10,16 @@
 
 int main( int argc, char *argv[] )
 {
-//  if ( argc < 4 )
-//  {
-//    std::cout << " Usage: " << std::endl;
-//    std::cout << argv[ 0 ] << std::endl;
-//    std::cout << "  < inputStationaryVelocityField >" << std::endl;
-//    std::cout << "  < inputMovingImage > " << std::endl;
-//    std::cout << "  < outputDisplacementField > " << std::endl;
-//    std::cout << "  < outputWarpedImage > " << std::endl;
-//    return -1;
-//  }
+  if ( argc < 4 )
+  {
+    std::cout << " Usage: " << std::endl;
+    std::cout << argv[ 0 ] << std::endl;
+    std::cout << "  < inputStationaryVelocityField >" << std::endl;
+    std::cout << "  < inputMovingImage > " << std::endl;
+    std::cout << "  < outputDisplacementField > " << std::endl;
+    std::cout << "  < outputWarpedImage > " << std::endl;
+    return -1;
+  }
 
   std::ostringstream oss;
 

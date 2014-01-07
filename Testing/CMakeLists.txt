@@ -103,3 +103,6 @@ target_link_libraries(ConvertSVFToDefAndWarp3D ${ITK_LIBRARIES})
 
 add_executable(MakeTestImages3D MakeTestImages3D.cxx)
 target_link_libraries(MakeTestImages3D ${ITK_LIBRARIES})
+
+add_executable(MakeTestImages3D_2 MakeTestImages3D_2.cxx)
+target_link_libraries(MakeTestImages3D_2 ${ITK_LIBRARIES})
