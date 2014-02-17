@@ -95,8 +95,10 @@ protected:
   itkGetObjectMacro( Adder, AdderType );
 
   /** Set/Get the multipliers. */
-  itkSetObjectMacro( MultiplierByHalf, MultiplierType );
-  itkGetObjectMacro( MultiplierByHalf, MultiplierType );
+  itkSetObjectMacro( MultiplierByHalfSVF, MultiplierType );
+  itkGetObjectMacro( MultiplierByHalfSVF, MultiplierType );
+  itkSetObjectMacro( MultiplierByHalfBracket, MultiplierType );
+  itkGetObjectMacro( MultiplierByHalfBracket, MultiplierType );
 
   /** Set/Get the Lie bracket filters. */
   itkSetObjectMacro( LieBracketFilterFirstOrder, LieBracketFilterType );
@@ -123,7 +125,8 @@ private:
   AdderPointer            m_Adder;
   LieBracketFilterPointer m_LieBracketFilterFirstOrder;
   LieBracketFilterPointer m_LieBracketFilterSecondOrder;
-  MultiplierPointer       m_MultiplierByHalf;
+  MultiplierPointer       m_MultiplierByHalfSVF;
+  MultiplierPointer       m_MultiplierByHalfBracket;
   unsigned int            m_NumberOfApproximationOrder;
 };
 

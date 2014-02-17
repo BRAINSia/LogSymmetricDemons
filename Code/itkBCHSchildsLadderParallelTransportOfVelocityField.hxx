@@ -27,12 +27,15 @@ BCHSchildsLadderParallelTransportOfVelocityField<TInputImage, TOutputImage>
   m_Adder = AdderType::New();
   m_LieBracketFilterFirstOrder = LieBracketFilterType::New();
   m_LieBracketFilterSecondOrder = LieBracketFilterType::New();
-  m_MultiplierByHalf = MultiplierType::New();
+  m_MultiplierByHalfSVF = MultiplierType::New();
+  m_MultiplierByHalfBracket = MultiplierType::New();
 
   // Multipliers can always be inplace here
-  m_MultiplierByHalf->InPlaceOn();
+  m_MultiplierByHalfSVF->InPlaceOn();
+  m_MultiplierByHalfBracket->InPlaceOn();
 
-  m_MultiplierByHalf->SetConstant( 0.5 );
+  m_MultiplierByHalfSVF->SetConstant( 0.5 );
+  m_MultiplierByHalfBracket->SetConstant( 0.5 );
 }
   
 /**
@@ -57,7 +60,7 @@ BCHSchildsLadderParallelTransportOfVelocityField<TInputImage, TOutputImage>
   os << indent << "Adder: " << m_Adder << std::endl;
   os << indent << "LieBracketFilterFirstOrder: " << m_LieBracketFilterFirstOrder << std::endl;
   os << indent << "LieBracketFilterSecondOrder: " << m_LieBracketFilterSecondOrder << std::endl;
-  os << indent << "MultiplierByHalf: " << m_MultiplierByHalf << std::endl;
+  os << indent << "MultiplierByHalf: " << m_MultiplierByHalfBracket << std::endl;
   os << indent << "NumberOfApproximationOrder: " << m_NumberOfApproximationOrder << std::endl;
 }
 
@@ -82,22 +85,25 @@ BCHSchildsLadderParallelTransportOfVelocityField<TInputImage, TOutputImage>
     case 5:
       {
       progress->RegisterInternalFilter(m_LieBracketFilterFirstOrder, 0.5);
-      progress->RegisterInternalFilter(m_MultiplierByHalf, 0.2);
+      progress->RegisterInternalFilter(m_MultiplierByHalfBracket, 0.2);
       progress->RegisterInternalFilter(m_Adder, 0.3);
 
       // u = leftField
       // v = rightField
-      m_LieBracketFilterFirstOrder->SetInput( 0, rightField );
+      m_MultiplierByHalfSVF->SetInput( rightField ); 
+      m_LieBracketFilterFirstOrder->SetInput( 0, m_MultiplierByHalfSVF->GetOutput() );
       m_LieBracketFilterFirstOrder->SetInput( 1, leftField );
 
-      m_LieBracketFilterSecondOrder->SetInput( 0, rightField );
+      m_LieBracketFilterSecondOrder->SetInput( 0, m_MultiplierByHalfSVF->GetOutput() );
       m_LieBracketFilterSecondOrder->SetInput( 1, m_LieBracketFilterFirstOrder->GetOutput() );
-      m_MultiplierByHalf->SetInput( m_LieBracketFilterSecondOrder->GetOutput() );
+      m_MultiplierByHalfBracket->SetInput( m_LieBracketFilterSecondOrder->GetOutput() );
 
       // u + [v, u] + 0.5 * [v, [v, u]]
+      // But v = v/2 due to Schild's ladder construct
+      // Therefore, BCH approx will be u + [0.5*v, u] + 0.5 * [0.5*v, [0.5*v, u]]
       m_Adder->SetInput( 0, leftField );
       m_Adder->SetInput( 1, m_LieBracketFilterFirstOrder->GetOutput() );
-      m_Adder->SetInput( 2, m_MultiplierByHalf->GetOutput() );
+      m_Adder->SetInput( 2, m_MultiplierByHalfBracket->GetOutput() );
   
 #if ( ITK_VERSION_MAJOR < 3 ) || ( ITK_VERSION_MAJOR == 3 && ITK_VERSION_MINOR < 13 )
       // Work-around for http://www.itk.org/Bug/view.php?id=8672
