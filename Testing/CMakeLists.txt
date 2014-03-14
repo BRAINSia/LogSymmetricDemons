@@ -80,13 +80,29 @@ else(KWSTYLE_EXECUTABLE)
 endif(KWSTYLE_EXECUTABLE)
 endif()
 
-add_executable(MakeTestImages MakeTestImages.cxx)
-target_link_libraries(MakeTestImages ${ITK_LIBRARIES})
+add_executable(MakeTestImages2D MakeTestImages2D.cxx)
+target_link_libraries(MakeTestImages2D ${ITK_LIBRARIES})
 
-add_test(NAME MakeTestImages COMMAND  ${PROJECT_BINARY_DIR}/bin/MakeTestImages
+add_test(NAME MakeTestImages2D COMMAND  ${PROJECT_BINARY_DIR}/bin/MakeTestImages2D
   ${PROJECT_BINARY_DIR}/Testing/ellipse.png
   ${PROJECT_BINARY_DIR}/Testing/box.png
   ${PROJECT_BINARY_DIR}/Testing/box45.png
   ${PROJECT_BINARY_DIR}/Testing/star.png
   ${PROJECT_BINARY_DIR}/Testing/xorstar.png
+  45.0
   )
+
+add_executable(DistanceMaps2D DistanceMaps2D.cxx)
+target_link_libraries(DistanceMaps2D ${ITK_LIBRARIES})
+
+add_executable(ConvertSVFToDefAndWarp2D ConvertSVFToDefAndWarp2D.cxx)
+target_link_libraries(ConvertSVFToDefAndWarp2D ${ITK_LIBRARIES})
+
+add_executable(ConvertSVFToDefAndWarp3D ConvertSVFToDefAndWarp3D.cxx)
+target_link_libraries(ConvertSVFToDefAndWarp3D ${ITK_LIBRARIES})
+
+add_executable(MakeTestImages3D MakeTestImages3D.cxx)
+target_link_libraries(MakeTestImages3D ${ITK_LIBRARIES})
+
+add_executable(MakeTestImages3D_2 MakeTestImages3D_2.cxx)
+target_link_libraries(MakeTestImages3D_2 ${ITK_LIBRARIES})

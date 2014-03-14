@@ -102,6 +102,8 @@ protected:
   itkGetObjectMacro( MultiplierByHalf, MultiplierType );
   itkSetObjectMacro( MultiplierByTwelfth, MultiplierType );
   itkGetObjectMacro( MultiplierByTwelfth, MultiplierType );
+  itkSetObjectMacro( MultiplierByNegTwelfth, MultiplierType );
+  itkGetObjectMacro( MultiplierByNegTwelfth, MultiplierType );
 
   /** Set/Get the Lie bracket filters. */
   itkSetObjectMacro( LieBracketFilterFirstOrder, LieBracketFilterType );
@@ -130,6 +132,7 @@ private:
   LieBracketFilterPointer m_LieBracketFilterSecondOrder;
   MultiplierPointer       m_MultiplierByHalf;
   MultiplierPointer       m_MultiplierByTwelfth;
+  MultiplierPointer       m_MultiplierByNegTwelfth;
   unsigned int            m_NumberOfApproximationOrder;
 };
 

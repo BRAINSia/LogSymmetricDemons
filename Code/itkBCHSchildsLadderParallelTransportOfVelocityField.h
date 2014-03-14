@@ -1,14 +1,17 @@
-#ifndef __itkVelocityFieldBCHCompositionFilter_h
-#define __itkVelocityFieldBCHCompositionFilter_h
+#ifndef __itkBCHSchildsLadderParallelTransportOfVelocityField_h
+#define __itkBCHSchildsLadderParallelTransportOfVelocityField_h
 
 #include <itkImageToImageFilter.h>
 #include <itkNaryAddImageFilter.h>
 #include <itkVelocityFieldLieBracketFilter.h>
+#include <itkVelocityFieldBCHCompositionFilter.h>
 #include <itkMultiplyImageFilter.h>
 
 namespace itk
 {
-/** \class VelocityFieldBCHCompositionFilter
+/* TODO: edit doc */
+
+/** \class BCHSchildsLadderParallelTransportOfVelocityField
  * \brief Compute Baker-Campbell-Hausdorff formula on two vector fields.
  *
  * See M. Bossa, M. Hernandez and S.Olmos, "Contributions to 3D diffeomorphic atlas
@@ -27,7 +30,7 @@ namespace itk
  * that the vector elements behave like floating point scalars.
  *
  * The number of approximation terms to used in the BCH approximation is set via
- * SetNumberOfApproximationTerms method.
+ * SetNumberOfApproximationOrder method.
  *
  * \warning This filter assumes that the input field type and velocity field type
  * both have the same number of dimensions.
@@ -35,12 +38,12 @@ namespace itk
  * \author Florence Dru, INRIA and Tom Vercauteren, MKT
  */
 template <class TInputImage, class TOutputImage>
-class ITK_EXPORT VelocityFieldBCHCompositionFilter :
+class ITK_EXPORT BCHSchildsLadderParallelTransportOfVelocityField :
   public InPlaceImageFilter<TInputImage, TOutputImage>
 {
 public:
   /** Standard class typedefs. */
-  typedef VelocityFieldBCHCompositionFilter             Self;
+  typedef BCHSchildsLadderParallelTransportOfVelocityField             Self;
   typedef InPlaceImageFilter<TInputImage, TOutputImage> Superclass;
   typedef SmartPointer<Self>                            Pointer;
   typedef SmartPointer<const Self>                      ConstPointer;
@@ -60,16 +63,14 @@ public:
   itkNewMacro(Self);
 
   /** Run-time type information (and related methods). */
-  itkTypeMacro( VelocityFieldBCHCompositionFilter, InPlaceImageFilter );
+  itkTypeMacro( BCHSchildsLadderParallelTransportOfVelocityField, InPlaceImageFilter );
 
-  /** Set/Get the NumberOfApproximationTerms used in the BCH approximation. */
-  itkSetMacro( NumberOfApproximationTerms, unsigned int );
-  itkGetConstMacro( NumberOfApproximationTerms, unsigned int );
+  /** Set/Get the NumberOfApproximationOrder used in the BCH approximation. */
+  itkSetMacro( NumberOfApproximationOrder, unsigned int );
+  itkGetConstMacro( NumberOfApproximationOrder, unsigned int );
 protected:
-  VelocityFieldBCHCompositionFilter();
-  ~VelocityFieldBCHCompositionFilter()
-  {
-  };
+  BCHSchildsLadderParallelTransportOfVelocityField();
+  ~BCHSchildsLadderParallelTransportOfVelocityField();
   void PrintSelf(std::ostream& os, Indent indent) const;
 
   /**
@@ -86,21 +87,18 @@ protected:
   typedef typename LieBracketFilterType::Pointer                        LieBracketFilterPointer;
 
   /** Multiplier type. */
-  typedef MultiplyImageFilter<InputFieldType,
-          itk::Image<double,InputFieldType::ImageDimension>, InputFieldType> MultiplierType;
-  typedef typename MultiplierType::Pointer                                   MultiplierPointer;
+  typedef MultiplyImageFilter<InputFieldType, itk::Image<double,InputFieldType::ImageDimension> , InputFieldType> MultiplierType;
+  typedef typename MultiplierType::Pointer                                      MultiplierPointer;
 
   /** Set/Get the adder. */
   itkSetObjectMacro( Adder, AdderType );
   itkGetObjectMacro( Adder, AdderType );
 
   /** Set/Get the multipliers. */
-  itkSetObjectMacro( MultiplierByHalf, MultiplierType );
-  itkGetObjectMacro( MultiplierByHalf, MultiplierType );
-  itkSetObjectMacro( MultiplierByTwelfth, MultiplierType );
-  itkGetObjectMacro( MultiplierByTwelfth, MultiplierType );
-  itkSetObjectMacro( MultiplierByNegTwelfth, MultiplierType );
-  itkGetObjectMacro( MultiplierByNegTwelfth, MultiplierType );
+  itkSetObjectMacro( MultiplierByHalfSVF, MultiplierType );
+  itkGetObjectMacro( MultiplierByHalfSVF, MultiplierType );
+  itkSetObjectMacro( MultiplierByHalfBracket, MultiplierType );
+  itkGetObjectMacro( MultiplierByHalfBracket, MultiplierType );
 
   /** Set/Get the Lie bracket filters. */
   itkSetObjectMacro( LieBracketFilterFirstOrder, LieBracketFilterType );
@@ -121,23 +119,21 @@ protected:
 
 #endif
 private:
-  VelocityFieldBCHCompositionFilter(const Self &); // purposely not implemented
+  BCHSchildsLadderParallelTransportOfVelocityField(const Self &); // purposely not implemented
   void operator=(const Self &);                    // purposely not implemented
 
   AdderPointer            m_Adder;
   LieBracketFilterPointer m_LieBracketFilterFirstOrder;
   LieBracketFilterPointer m_LieBracketFilterSecondOrder;
-  MultiplierPointer       m_MultiplierByHalf;
-  MultiplierPointer       m_MultiplierByTwelfth;
-  MultiplierPointer       m_MultiplierByNegTwelfth;
-  unsigned int            m_NumberOfApproximationTerms;
-
+  MultiplierPointer       m_MultiplierByHalfSVF;
+  MultiplierPointer       m_MultiplierByHalfBracket;
+  unsigned int            m_NumberOfApproximationOrder;
 };
 
 } // end namespace itk
 
 #ifndef ITK_MANUAL_INSTANTIATION
-#include "itkVelocityFieldBCHCompositionFilter.hxx"
+#include "itkBCHSchildsLadderParallelTransportOfVelocityField.hxx"
 #endif
 
 #endif
